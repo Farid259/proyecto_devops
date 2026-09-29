@@ -15,3 +15,11 @@ k8s
 monitoring
 docs
 .github
+.vscode
+tests
+requirements-dev.txt
+pytest.ini
+.coverage*
+htmlcov
+AGENTS.md
+README.md

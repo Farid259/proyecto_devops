@@ -5,7 +5,8 @@ API de conversion de temperaturas con FastAPI, sin frontend ni base de datos.
 ## Estado
 
 API, entorno virtual y 18 pruebas implementadas. Validado con Python 3.14.5 en Windows.
-Dockerfile, Terraform, Kubernetes, pipeline y dashboards pendientes de implementar.
+Dockerfile implementado; construccion y ejecucion en Docker pendientes de validar.
+Terraform, Kubernetes, pipeline y dashboards pendientes de implementar.
 
 ## Preparar el entorno en PowerShell
 
@@ -77,10 +78,64 @@ Invoke-RestMethod 'http://127.0.0.1:8000/health'
 - `tests/`: pruebas.
 - `docs/evidence/`: resultados y dependencias del entorno validado.
 - `k8s/`, `terraform/`, `monitoring/`, `.github/workflows/`: preparadas, aun sin implementar.
-- `Dockerfile`: marcador pendiente de sustituir por un build multi-stage funcional.
+- `Dockerfile`: build multi-stage con etapas builder y runtime.
 
-El siguiente paso es crear y validar la imagen Docker. Luego agregaremos Kubernetes,
+El siguiente paso es construir y validar la imagen Docker. Luego agregaremos Kubernetes,
 Terraform, CI/CD, SAST/DAST, monitoreo, configuraciones de costos e informe final.
 
 Referencias: [FastAPI testing](https://fastapi.tiangolo.com/tutorial/testing/)
 y [Prometheus Python](https://prometheus.github.io/client_python/).
+
+
+## Docker
+
+Requiere Docker Desktop iniciado y configurado para contenedores Linux.
+Desde la raiz del proyecto:
+
+```powershell
+docker build --pull -t proyecto-devops:local .
+docker run --detach --name proyecto-devops-local -p 127.0.0.1:8001:8000 proyecto-devops:local
+```
+
+Usamos el puerto local 8001 para evitar conflictos con Uvicorn local en 8000.
+Abrir http://127.0.0.1:8001/docs. Validar:
+
+```powershell
+Invoke-RestMethod 'http://127.0.0.1:8001/health'
+Invoke-RestMethod 'http://127.0.0.1:8001/api/convert?celsius=20'
+(Invoke-WebRequest 'http://127.0.0.1:8001/metrics').Content
+docker inspect --format '{{.State.Health.Status}}' proyecto-devops-local
+docker exec proyecto-devops-local id
+docker logs proyecto-devops-local
+```
+
+Resultados esperados: salud `ok`, conversion 68 Fahrenheit y 293.15 Kelvin,
+metricas HTTP y usuario con UID 10001. El healthcheck puede tardar unos 30 segundos
+en pasar de `starting` a `healthy`.
+
+Detener y eliminar exclusivamente este contenedor de prueba:
+
+```powershell
+docker stop proyecto-devops-local
+docker rm proyecto-devops-local
+```
+
+### Decisiones del Dockerfile
+
+- Base oficial `python:3.14.7-slim-bookworm`: Python 3.14 como en desarrollo,
+  con una revision de mantenimiento mas reciente. La etiqueta no fija un digest.
+- `builder` instala dependencias de ejecucion en `/opt/venv` usando wheels.
+  Si no existe un wheel para la plataforma, el build falla de forma explicita.
+- `runtime` copia ese entorno y `app/`; no incorpora pruebas ni dependencias de desarrollo.
+- Se copia requirements antes que el codigo para reutilizar la capa de dependencias.
+- Usuario sin privilegios, logs sin buffering y healthcheck con la biblioteca estandar.
+- Un worker, sin `--reload`, mantiene las metricas en un solo proceso.
+- `.dockerignore` excluye .venv, Git, configuraciones locales y archivos sensibles.
+- El entorno virtual local de Windows no se copia a la imagen Linux.
+
+Estado de validacion: no se pudo construir ni arrancar la imagen desde la sesion
+asistida por falta de acceso al motor Docker de Windows. Los comandos anteriores
+quedan pendientes de ejecutar en la terminal del usuario.
+
+Referencias: [builds multi-stage](https://docs.docker.com/get-started/docker-concepts/building-images/multi-stage-builds/)
+y [imagen oficial de Python](https://hub.docker.com/_/python).
