@@ -1,0 +1,14 @@
+Validacion local: 2026-09-28
+Windows; Python 3.14.5
+python -m pytest -q: 18 passed, 1 warning in 0.59s
+Aviso de Starlette: usar httpx en TestClient esta deprecado; sugiere httpx2.
+python -m pip check: No broken requirements found.
+Uvicorn real: /health, /api/convert y /metrics OK; servidor detenido tras validar.
+
+Correccion de advertencias:
+Se reemplazo httpx por httpx2==2.13.1 en requirements-dev.txt y en .venv.
+Se regenero la cache mediante pytest --cache-clear.
+Comando: python -m pytest --cache-clear -q -W error
+Resultado: 18 passed in 0.66s, sin advertencias.
+Comando: python -m pip check
+Resultado: No broken requirements found.
