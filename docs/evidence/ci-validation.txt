@@ -1,0 +1,8 @@
+﻿Validacion local del workflow CI - 2026-09-29
+python -m pytest -q: 18 passed in 0.70s
+python -m bandit -r app: 79 lineas analizadas; 0 hallazgos; 0 archivos omitidos.
+python -m pip check: No broken requirements found.
+actionlint v1.7.7 -shellcheck= -pyflakes= .github/workflows/ci.yml: exit 0, sin errores.
+Los analizadores opcionales shellcheck y pyflakes no se ejecutaron.
+Las referencias SHA de acciones se verificaron con git ls-remote en repositorios oficiales.
+Pendiente: ejecucion completa en GitHub Actions y primera publicacion en GHCR tras push.

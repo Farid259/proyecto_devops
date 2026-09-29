@@ -6,7 +6,9 @@ API de conversion de temperaturas con FastAPI, sin frontend ni base de datos.
 
 API, entorno virtual y 18 pruebas implementadas. Validado con Python 3.14.5 en Windows.
 Dockerfile implementado; construccion y ejecucion en Docker pendientes de validar.
-Terraform, Kubernetes, pipeline y dashboards pendientes de implementar.
+CI con GitHub Actions implementado; primera ejecucion remota pendiente.
+Terraform, Kubernetes, despliegue y dashboards pendientes de implementar.
+DAST incorporado al workflow; primer analisis remoto pendiente.
 
 ## Preparar el entorno en PowerShell
 
@@ -77,7 +79,8 @@ Invoke-RestMethod 'http://127.0.0.1:8000/health'
 - `app/`: API Python.
 - `tests/`: pruebas.
 - `docs/evidence/`: resultados y dependencias del entorno validado.
-- `k8s/`, `terraform/`, `monitoring/`, `.github/workflows/`: preparadas, aun sin implementar.
+- `.github/workflows/ci.yml`: pruebas, SAST, construccion y publicacion de imagen.
+- `k8s/`, `terraform/`, `monitoring/`: preparadas, aun sin implementar.
 - `Dockerfile`: build multi-stage con etapas builder y runtime.
 
 El siguiente paso es construir y validar la imagen Docker. Luego agregaremos Kubernetes,
@@ -139,3 +142,98 @@ quedan pendientes de ejecutar en la terminal del usuario.
 
 Referencias: [builds multi-stage](https://docs.docker.com/get-started/docker-concepts/building-images/multi-stage-builds/)
 y [imagen oficial de Python](https://hub.docker.com/_/python).
+
+
+## GitHub Actions: CI y publicacion de imagen
+
+El workflow `.github/workflows/ci.yml` se ejecuta en pushes a `main`, pull requests
+hacia `main` y manualmente desde Actions. Incluye tres jobs:
+
+1. **tests**: instala dependencias, comprueba compatibilidad y ejecuta pytest.
+2. **sast**: ejecuta Bandit sobre `app/`; cualquier hallazgo hace fallar el job.
+3. **docker**: requiere los dos anteriores, construye la imagen, espera el healthcheck,
+   comprueba endpoints y UID 10001, ejecuta DAST y publica exactamente esa imagen validada.
+
+La publicacion solo ocurre en pushes a `main`. Los pull requests y ejecuciones
+manuales validan sin publicar. Las acciones externas estan fijadas por SHA.
+La autenticacion usa el `GITHUB_TOKEN` automatico con `packages: write` en el job
+Docker; no se necesita crear un token personal ni una cuenta de Docker Hub.
+
+Imagen: `ghcr.io/farid259/proyecto_devops`.
+Etiquetas: `sha-<SHA completo del commit>` y `latest`. Para futuros despliegues,
+preferir la etiqueta del commit o el digest en lugar de `latest`.
+
+### Primera ejecucion
+
+Subir los cambios a `main` y abrir:
+https://github.com/Farid259/proyecto_devops/actions
+
+Revisar que los tres jobs terminen correctamente. Cada ejecucion guarda artifacts
+con el reporte pytest, reporte JSON de Bandit y logs/inspeccion del contenedor
+por 14 dias. Descargar los necesarios para el informe antes de que caduquen.
+La imagen aparecera en Packages del perfil/repositorio al publicarse.
+
+La visibilidad del paquete GHCR se gestiona por separado: un repositorio publico
+no garantiza una imagen publica. Para permitir descargas anonimas, comprobar en
+Package settings que su visibilidad sea Public. Si permanece privado, los futuros
+clientes y el cluster necesitaran autenticacion para descargarla.
+
+Si GitHub deniega el push del paquete, revisar los permisos efectivos de Actions
+y que el paquete, si ya existia, permita acceso a este repositorio.
+
+### Ejecutar SAST localmente
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-security.txt
+.\.venv\Scripts\python.exe -m bandit -r app
+```
+
+Bandit analiza patrones de seguridad del codigo Python. No reemplaza DAST ni un
+analisis de vulnerabilidades de dependencias o de la imagen. DAST se ejecuta
+con ZAP como se describe a continuacion; los otros analisis quedan pendientes.
+
+Validacion local de esta etapa: 18 pruebas aprobadas y Bandit sin hallazgos.
+La ejecucion completa del workflow y la publicacion en GHCR requieren el primer push.
+
+Referencia: https://docs.github.com/en/actions/tutorials/publish-packages/publish-docker-images
+
+
+## DAST con OWASP ZAP
+
+El job Docker ejecuta un escaneo activo de la API temporal del runner, despues de
+las pruebas funcionales y antes del login y la publicacion en GHCR. Usa la imagen
+oficial `ghcr.io/zaproxy/zaproxy:stable` (etiqueta actualizable, no fijada por digest).
+
+ZAP importa `http://127.0.0.1:18000/openapi.json` y envia solicitudes de prueba a
+las operaciones declaradas. `--network host` permite alcanzar el puerto local del
+runner Linux; no necesita publicar la API en Internet. El escaneo solo apunta al
+contenedor efimero de esta ejecucion, no a produccion ni a servicios ajenos.
+
+La cobertura depende de OpenAPI: `/metrics` tiene `include_in_schema=False`, por lo
+que no forma parte del escaneo importado. Su funcionamiento se valida por separado
+con la prueba del contenedor. Tampoco se analiza aun un Ingress ni un cluster.
+
+### Criterio de bloqueo
+
+Se conserva la politica predeterminada de ZAP: cualquier alerta WARN o FAIL, asi
+como errores del escaner, hace fallar el paso y bloquea la publicacion. No se usan
+`-I`, reglas IGNORE ni `continue-on-error`. El primer analisis puede detectar
+advertencias de cabeceras u otros hallazgos: revisar el reporte antes de corregirlos
+o justificar una excepcion especifica. No considerar la integracion como aprobada
+hasta que termine el primer analisis real.
+
+ZAP devuelve 0 sin hallazgos bloqueantes, 1 con FAIL, 2 con WARN y 3 ante otros errores.
+El paso tiene un limite total de 15 minutos; `-T 5` limita la espera de arranque y
+analisis pasivo, no la duracion total del escaneo activo.
+
+### Evidencias
+
+El artifact `zap-results` conserva `report.html`, `report.json` y `report.md` durante
+14 dias, incluso si el analisis detecta alertas. Si falla antes de producir reportes,
+consultar los logs del paso. Los logs de la API siguen en `docker-results`.
+Descargar los reportes desde la ejecucion en Actions para el informe final.
+
+Estado: workflow validado estaticamente; ejecucion real pendiente en GitHub Actions
+porque esta sesion no tiene acceso al motor Docker local.
+
+Referencia: https://www.zaproxy.org/docs/docker/api-scan/

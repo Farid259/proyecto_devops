@@ -23,3 +23,6 @@ pytest.ini
 htmlcov
 AGENTS.md
 README.md
+
+requirements-security.txt
+reports

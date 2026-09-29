@@ -36,3 +36,6 @@ crash.*.log
 # Archivos del sistema
 .DS_Store
 Thumbs.db
+
+# Reportes temporales del pipeline
+reports/

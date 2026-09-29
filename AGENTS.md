@@ -8,3 +8,12 @@
 - No guardar credenciales, archivos `.env`, estado de Terraform ni kubeconfig en Git.
 - Actualizar README cuando cambien los pasos de instalación o ejecución.
 - Documentar evidencias reales y distinguir las tareas pendientes de las verificadas.
+
+- CI: `.github/workflows/ci.yml`; pruebas y Bandit deben pasar antes del job Docker.
+- SAST local: instalar `requirements-security.txt` y ejecutar `python -m bandit -r app`.
+- Imagen remota: `ghcr.io/farid259/proyecto_devops`; publicar solo en pushes a `main`.
+- Conservar acciones de GitHub fijadas por SHA; usar GITHUB_TOKEN, nunca credenciales en archivos.
+- Etiquetar imagen con el SHA del commit y verificar el contenedor antes de publicarla.
+
+- DAST: ejecutar ZAP API Scan contra la API temporal del runner antes de publicar; WARN, FAIL y errores bloquean la imagen.
+- Guardar reportes ZAP como artifacts incluso cuando el escaneo falle; no ignorar alertas sin justificar la regla concreta.
