@@ -4,7 +4,7 @@ API de conversion de temperaturas con FastAPI, sin frontend ni base de datos.
 
 ## Estado
 
-API, entorno virtual y 18 pruebas implementadas. Validado con Python 3.14.5 en Windows.
+API, entorno virtual y 26 pruebas implementadas. Validado con Python 3.14.5 en Windows.
 Dockerfile implementado; construccion y ejecucion en Docker pendientes de validar.
 CI con GitHub Actions implementado; primera ejecucion remota pendiente.
 Terraform, Kubernetes, despliegue y dashboards pendientes de implementar.
@@ -237,3 +237,18 @@ Estado: workflow validado estaticamente; ejecucion real pendiente en GitHub Acti
 porque esta sesion no tiene acceso al motor Docker local.
 
 Referencia: https://www.zaproxy.org/docs/docker/api-scan/
+
+
+### Correccion de hallazgos ZAP 10021 y 90004
+
+La API agrega `X-Content-Type-Options: nosniff` para impedir que el navegador
+interprete la respuesta con un tipo distinto del Content-Type declarado, y
+`Cross-Origin-Resource-Policy: same-origin` para restringir cargas no-CORS desde
+otros origenes. CORP no reemplaza autenticacion ni configura permisos CORS.
+Si se incorpora un frontend en otro origen, revisar esta politica junto con CORS.
+
+Las pruebas comprueban ambas cabeceras en los endpoints informados por ZAP,
+la documentacion, metricas y respuestas 404/422. Validacion local: 26 pruebas
+aprobadas y Bandit sin hallazgos. La cache local de pytest emitio una advertencia
+de escritura; las pruebas se ejecutaron correctamente. El nuevo resultado de
+ZAP queda pendiente de reconstruir y analizar la imagen mediante el pipeline.

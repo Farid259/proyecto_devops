@@ -36,6 +36,14 @@ def create_app() -> FastAPI:
     )
 
     @api.middleware("http")
+    async def security_headers(request: Request, call_next):
+        response = await call_next(request)
+        # Respetar el Content-Type y restringir cargas no-CORS desde otros orígenes.
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
+        return response
+
+    @api.middleware("http")
     async def record_metrics(request: Request, call_next):
         # El scraping de Prometheus no debe inflar las métricas de tráfico.
         if request.url.path == "/metrics":

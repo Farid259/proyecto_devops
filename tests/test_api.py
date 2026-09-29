@@ -11,6 +11,19 @@ def client():
         yield test_client
 
 
+@pytest.mark.parametrize(
+    "path,status",
+    [("/", 200), ("/health", 200), ("/api/convert?celsius=1.2", 200),
+     ("/openapi.json", 200), ("/docs", 200), ("/metrics", 200),
+     ("/api/convert?celsius=invalid", 422), ("/missing", 404)],
+)
+def test_security_headers(client, path, status):
+    response = client.get(path)
+    assert response.status_code == status
+    assert response.headers["X-Content-Type-Options"] == "nosniff"
+    assert response.headers["Cross-Origin-Resource-Policy"] == "same-origin"
+
+
 def test_index(client):
     response = client.get("/")
     assert response.status_code == 200

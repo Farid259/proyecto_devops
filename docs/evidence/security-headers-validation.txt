@@ -1,0 +1,5 @@
+2026-09-29: correccion de ZAP 10021 y 90004.
+python -m pytest -q: 26 passed, 1 warning in 0.98s.
+Warning: PytestCacheWarning por escritura de cache en Windows.
+python -m bandit -r app: 85 lineas, 0 hallazgos.
+ZAP remoto posterior a la correccion: pendiente.
