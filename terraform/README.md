@@ -202,3 +202,17 @@ Evidencia de cierre: [aws-destroy-validation.txt](../docs/evidence/aws-destroy-v
 Ver [bootstrap persistente: S3, OIDC y aprobacion](bootstrap/README.md).
 Configuracion preparada, pendiente de aplicar y migrar el estado.
 El laboratorio mantiene su backend actual hasta completar esa guia.
+
+## Validacion de proveedores en Windows y Linux
+
+Los lockfiles incluyen checksums oficiales de ambas plataformas. Si se actualiza
+el proveedor, regenerarlos antes de hacer commit:
+
+```powershell
+.\.tools\terraform.exe -chdir=terraform providers lock -platform=windows_amd64 -platform=linux_amd64
+.\.tools\terraform.exe -chdir=terraform/bootstrap providers lock -platform=windows_amd64 -platform=linux_amd64
+```
+
+CI ejecuta init -backend=false -lockfile=readonly y validate en Linux para ambos
+roots, sin credenciales AWS. No quitar la comprobacion de checksums para evitar
+un error de instalacion. Evidencia: [correccion Linux](../docs/evidence/cd-checksum-fix.txt).

@@ -1,0 +1,9 @@
+Fallo CD: ejecucion 36791765318, 2026-09-30.
+OIDC exitoso; fallo validate por checksum del proveedor AWS 6.38.0 en Linux.
+providers lock -platform=windows_amd64 -platform=linux_amd64 agrego hash Linux.
+Version del proveedor conservada; checksums firmados por HashiCorp.
+Lockfiles de laboratorio y bootstrap actualizados.
+Agregada validacion Terraform Linux al CI, sin backend ni credenciales AWS.
+Este intento fallo antes de plan/apply del laboratorio.
+Validacion real en Docker Linux hashicorp/terraform:1.14.7: init -backend=false -lockfile=readonly y validate correctos.
+Actionlint: ci.yml y cd.yml sin errores.
