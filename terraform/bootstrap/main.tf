@@ -79,7 +79,7 @@ resource "aws_iam_role" "github" {
       Principal = { Federated = local.oidc_arn }
       Condition = { StringEquals = {
         "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
-        "token.actions.githubusercontent.com:sub" = "repo:Farid259/proyecto_devops:environment:aws-lab"
+        "token.actions.githubusercontent.com:sub" = "repo:Farid259@89980590/proyecto_devops@1394095415:environment:aws-lab"
       } }
     }]
   })

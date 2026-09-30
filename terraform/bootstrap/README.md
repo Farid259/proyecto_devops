@@ -104,3 +104,11 @@ Si la migracion de un estado vacio no crea objeto S3, comprobar que el respaldo
 no tenga recursos y usar terraform state push con ese respaldo, sin -force.
 Conservar DevOpsBootstrapAdmin mientras se administra el bootstrap. Antes de
 retirarla, mantener permisos de estado S3 para las operaciones locales futuras.
+
+## Subject OIDC del repositorio
+
+Este repositorio usa use_immutable_subject=true. La confianza AWS debe coincidir
+exactamente con repo:Farid259@89980590/proyecto_devops@1394095415:environment:aws-lab.
+Consultar GET /repos/Farid259/proyecto_devops/actions/oidc/customization/sub
+antes de reutilizar esta configuracion en otro repositorio. No usar comodines.
+Referencia: https://docs.github.com/en/rest/actions/oidc
