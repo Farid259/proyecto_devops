@@ -1,0 +1,10 @@
+UTC: 2026-09-30T16:22:38.231839+00:00
+Terraform apply completo: 1 added, 0 changed, 0 destroyed.
+Cluster proyecto-devops-lab. Nodo ip-10-42-0-8.ec2.internal Ready.
+API api-7c5c598fd8-kmgrc Running 1/1, cero reinicios.
+Traefik chart 41.6.0 ClusterIP. Metrics Server sin parche TLS inseguro.
+HPA CPU 2%/60%, 1 replica. Sin prueba de carga AWS.
+Tunel localhost:18080 hacia servicio Traefik en contexto proyecto-devops-aws.
+HTTP 200: /health, /api/convert?celsius=20, /docs, /metrics.
+Conversion: fahrenheit=68.0, kelvin=293.15. Health: status=ok.
+Laboratorio activo para revision manual por instruccion del usuario; genera cargos.

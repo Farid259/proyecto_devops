@@ -1,0 +1,14 @@
+UTC: 2026-09-30T16:42:30.266382+00:00
+Plan: 0 altas, 0 cambios, 17 bajas.
+Apply complete! Resources: 0 added, 0 changed, 17 destroyed.
+terraform state list: vacio.
+EKS proyecto-devops-lab: ResourceNotFoundException.
+EC2 i-0a87d006369136a6a: terminated.
+EBS vol-08508a1389a56e51a: no encontrado (lista vacia).
+VPC vpc-0d65a906967fea63b: lista vacia.
+Interfaces de esa VPC: lista vacia.
+Tunel AWS localhost:18080 cerrado.
+No se crearon balanceadores ni NAT Gateway en este laboratorio.
+Se conservan usuario/politicas IAM de acceso y roles vinculados al servicio ajenos
+al estado Terraform. No se eliminaron recursos de otros proyectos ni kind local.
+Los consumos previos pueden aparecer posteriormente en facturacion.

@@ -1,0 +1,4 @@
+account_id = "123456789012"
+admin_principal_arn = "arn:aws:iam::123456789012:role/REEMPLAZAR"
+admin_cidr = "203.0.113.10/32" # Reemplazar por tu IP publica real.
+region = "us-east-1"

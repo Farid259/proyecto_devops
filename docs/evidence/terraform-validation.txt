@@ -1,0 +1,9 @@
+Fecha UTC: 2026-09-30T02:05:55.521396+00:00
+Terraform: 1.14.7 windows_amd64
+AWS provider: 6.38.0 (firma HashiCorp verificada por init)
+terraform init -backend=false -input=false: OK
+terraform fmt -check -recursive: OK
+terraform validate -no-color: Success! The configuration is valid.
+python -m pytest -q: 26 passed in 1.03s
+No se ejecuto plan ni apply contra AWS. No se crearon recursos cloud.
+AWS CLI no encontrado en PATH durante esta validacion.

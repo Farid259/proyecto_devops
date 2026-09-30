@@ -1,0 +1,9 @@
+Fecha UTC: 2026-09-30T15:49:48.564370+00:00
+Perfil: devops. Identidad IAM devops-lab verificada con STS.
+Consulta DescribeAvailabilityZones us-east-1: OK.
+terraform plan -input=false -no-color -out=lab.tfplan: exit 0.
+Plan: 17 to add, 0 to change, 0 to destroy.
+Revisado: EKS STANDARD, un nodo t3.medium (min=desired=max=1), disco 20 GB.
+Red: VPC, dos subredes, Internet Gateway, rutas. Sin NAT Gateway ni Load Balancer.
+Variables reales, plan binario y salida completa excluidos de Git (git check-ignore).
+NO se ejecuto apply. Plan no comprueba permisos de creacion/destruccion.

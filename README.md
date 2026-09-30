@@ -277,3 +277,17 @@ Kubeconfig contiene credenciales locales y no debe compartirse.
 La imagen se fija por digest de GHCR; Ingress usa Traefik. El HPA escala de 1 a 3
 replicas por CPU. Metrics Server permite el HPA; Prometheus y Grafana siguen pendientes.
 La guia explica los parches locales de cgroups v1 y certificados del kubelet.
+
+
+## AWS con Terraform
+
+> Estado actual: laboratorio AWS destruido y verificado el 2026-09-30. El acceso por tunel ya no esta disponible. Las instrucciones se conservan para un futuro despliegue.
+
+Configuracion del laboratorio temporal en [terraform/README.md](terraform/README.md).
+Incluye modulos de red y EKS, un nodo y acceso administrativo limitado a una IP.
+Infraestructura AWS desplegada, API verificada y laboratorio eliminado al terminar. Acceso usado durante la prueba:
+http://localhost:18080/docs. [Guia de acceso AWS](k8s/aws/README.md).
+El estado remoto y la automatizacion de cierre siguen pendientes.
+Cerrar el tunel no elimina el laboratorio ni detiene sus cargos.
+
+Evidencia de cierre: [aws-destroy-validation.txt](docs/evidence/aws-destroy-validation.txt).

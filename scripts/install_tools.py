@@ -3,6 +3,7 @@ from hashlib import sha256
 from pathlib import Path
 import platform
 import tarfile
+import zipfile
 from urllib.request import urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -37,4 +38,17 @@ if __name__ == '__main__':
     with tarfile.open(archive) as source:
         with source.extractfile('windows-amd64/helm.exe') as binary:
             (TOOLS / 'helm.exe').write_bytes(binary.read())
+    terraform_version = '1.14.7'
+    terraform_file = f'terraform_{terraform_version}_windows_amd64.zip'
+    terraform_base = f'https://releases.hashicorp.com/terraform/{terraform_version}/'
+    terraform_data = download(terraform_base + terraform_file)
+    checksums = download(terraform_base + f'terraform_{terraform_version}_SHA256SUMS').decode()
+    expected = next(line.split()[0] for line in checksums.splitlines()
+                    if line.split()[-1] == terraform_file)
+    if sha256(terraform_data).hexdigest() != expected:
+        raise RuntimeError('Checksum incorrecto: Terraform')
+    terraform_archive = TOOLS / terraform_file
+    terraform_archive.write_bytes(terraform_data)
+    with zipfile.ZipFile(terraform_archive) as source:
+        (TOOLS / 'terraform.exe').write_bytes(source.read('terraform.exe'))
     print('Herramientas verificadas en', TOOLS)

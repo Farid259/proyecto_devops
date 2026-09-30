@@ -1,0 +1,14 @@
+Primer apply: fallo parcial por permisos IAM.
+Creados: VPC, Internet Gateway, dos roles IAM y cuatro asociaciones de politicas.
+No se alcanzo la creacion del cluster EKS ni del grupo de nodos.
+Estado local conservado en terraform/terraform.tfstate (excluido de Git).
+Errores: CreateSubnet y CreateRouteTable sobre la VPC existente.
+Correccion local: statement CreateNetworkInsideTaggedVpc en lab-provision-policy.json.
+Pendiente: actualizar la politica administrada AWS y regenerar plan para reintentar.
+No reutilizar el plan anterior al apply parcial.
+
+Reintento: red completada; EKS creado tras 11m26s; acceso administrador creado.
+Nodegroup fallo: AWS no puede comprobar GetRole AWSServiceRoleForAmazonEKSNodegroup.
+Politica local ampliada con GetRole para los nombres exactos sin ruta de los roles
+vinculados, ademas de sus rutas aws-service-role. Pendiente actualizar politica AWS.
+El cluster queda activo por indicacion del usuario; nodo no creado. Hay cargos EKS.

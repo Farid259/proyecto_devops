@@ -1,0 +1,275 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadInfrastructure",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:Describe*",
+        "eks:ListClusters",
+        "eks:DescribeClusterVersions"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "us-east-1"
+        }
+      }
+    },
+    {
+      "Sid": "CreateTaggedNetwork",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:CreateVpc",
+        "ec2:CreateSubnet",
+        "ec2:CreateInternetGateway",
+        "ec2:CreateRouteTable"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "us-east-1",
+          "aws:RequestTag/Project": "proyecto-devops-lab"
+        }
+      }
+    },
+    {
+      "Sid": "ManageTaggedNetwork",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DeleteVpc",
+        "ec2:ModifyVpcAttribute",
+        "ec2:DeleteSubnet",
+        "ec2:ModifySubnetAttribute",
+        "ec2:DeleteInternetGateway",
+        "ec2:AttachInternetGateway",
+        "ec2:DetachInternetGateway",
+        "ec2:DeleteRouteTable",
+        "ec2:CreateRoute",
+        "ec2:ReplaceRoute",
+        "ec2:DeleteRoute",
+        "ec2:AssociateRouteTable",
+        "ec2:DisassociateRouteTable",
+        "ec2:ReplaceRouteTableAssociation"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "us-east-1",
+          "aws:ResourceTag/Project": "proyecto-devops-lab"
+        }
+      }
+    },
+    {
+      "Sid": "TagNetworkOnCreate",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:CreateTags"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "us-east-1",
+          "aws:RequestTag/Project": "proyecto-devops-lab",
+          "ec2:CreateAction": [
+            "CreateVpc",
+            "CreateSubnet",
+            "CreateInternetGateway",
+            "CreateRouteTable"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "MaintainNetworkTags",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:CreateTags",
+        "ec2:DeleteTags"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "us-east-1",
+          "aws:ResourceTag/Project": "proyecto-devops-lab"
+        }
+      }
+    },
+    {
+      "Sid": "CreateTaggedCluster",
+      "Effect": "Allow",
+      "Action": [
+        "eks:CreateCluster"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "us-east-1",
+          "aws:RequestTag/Project": "proyecto-devops-lab"
+        }
+      }
+    },
+    {
+      "Sid": "ManageLabEks",
+      "Effect": "Allow",
+      "Action": [
+        "eks:DescribeCluster",
+        "eks:DeleteCluster",
+        "eks:UpdateClusterConfig",
+        "eks:UpdateClusterVersion",
+        "eks:DescribeUpdate",
+        "eks:ListUpdates",
+        "eks:ListNodegroups",
+        "eks:CreateNodegroup",
+        "eks:DescribeNodegroup",
+        "eks:UpdateNodegroupConfig",
+        "eks:UpdateNodegroupVersion",
+        "eks:DeleteNodegroup",
+        "eks:CreateAccessEntry",
+        "eks:DescribeAccessEntry",
+        "eks:UpdateAccessEntry",
+        "eks:DeleteAccessEntry",
+        "eks:ListAccessEntries",
+        "eks:AssociateAccessPolicy",
+        "eks:DisassociateAccessPolicy",
+        "eks:ListAssociatedAccessPolicies",
+        "eks:TagResource",
+        "eks:UntagResource",
+        "eks:ListTagsForResource"
+      ],
+      "Resource": [
+        "arn:aws:eks:us-east-1:${account_id}:cluster/proyecto-devops-lab",
+        "arn:aws:eks:us-east-1:${account_id}:nodegroup/proyecto-devops-lab/*",
+        "arn:aws:eks:us-east-1:${account_id}:access-entry/proyecto-devops-lab/*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "us-east-1"
+        }
+      }
+    },
+    {
+      "Sid": "ManageLabRoles",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole",
+        "iam:GetRole",
+        "iam:DeleteRole",
+        "iam:UpdateAssumeRolePolicy",
+        "iam:TagRole",
+        "iam:UntagRole",
+        "iam:ListRoleTags",
+        "iam:ListAttachedRolePolicies",
+        "iam:ListRolePolicies",
+        "iam:GetRolePolicy",
+        "iam:ListInstanceProfilesForRole"
+      ],
+      "Resource": [
+        "arn:aws:iam::${account_id}:role/proyecto-devops-lab-cluster",
+        "arn:aws:iam::${account_id}:role/proyecto-devops-lab-node"
+      ]
+    },
+    {
+      "Sid": "AttachOnlyRequiredPolicies",
+      "Effect": "Allow",
+      "Action": [
+        "iam:AttachRolePolicy",
+        "iam:DetachRolePolicy"
+      ],
+      "Resource": [
+        "arn:aws:iam::${account_id}:role/proyecto-devops-lab-cluster",
+        "arn:aws:iam::${account_id}:role/proyecto-devops-lab-node"
+      ],
+      "Condition": {
+        "ArnEquals": {
+          "iam:PolicyARN": [
+            "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
+            "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+            "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPullOnly",
+            "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "PassClusterRole",
+      "Effect": "Allow",
+      "Action": [
+        "iam:PassRole"
+      ],
+      "Resource": "arn:aws:iam::${account_id}:role/proyecto-devops-lab-cluster",
+      "Condition": {
+        "StringEquals": {
+          "iam:PassedToService": "eks.amazonaws.com"
+        }
+      }
+    },
+    {
+      "Sid": "PassNodeRole",
+      "Effect": "Allow",
+      "Action": [
+        "iam:PassRole"
+      ],
+      "Resource": "arn:aws:iam::${account_id}:role/proyecto-devops-lab-node",
+      "Condition": {
+        "StringEquals": {
+          "iam:PassedToService": [
+            "ec2.amazonaws.com",
+            "eks.amazonaws.com"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "CreateRequiredServiceRoles",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateServiceLinkedRole"
+      ],
+      "Resource": [
+        "arn:aws:iam::${account_id}:role/aws-service-role/eks.amazonaws.com/*",
+        "arn:aws:iam::${account_id}:role/aws-service-role/eks-nodegroup.amazonaws.com/*",
+        "arn:aws:iam::${account_id}:role/aws-service-role/autoscaling.amazonaws.com/*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "iam:AWSServiceName": [
+            "eks.amazonaws.com",
+            "eks-nodegroup.amazonaws.com",
+            "autoscaling.amazonaws.com"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "ReadRequiredServiceRoles",
+      "Effect": "Allow",
+      "Action": [
+        "iam:GetRole"
+      ],
+      "Resource": [
+        "arn:aws:iam::${account_id}:role/aws-service-role/eks.amazonaws.com/*",
+        "arn:aws:iam::${account_id}:role/aws-service-role/eks-nodegroup.amazonaws.com/*",
+        "arn:aws:iam::${account_id}:role/aws-service-role/autoscaling.amazonaws.com/*",
+        "arn:aws:iam::${account_id}:role/AWSServiceRoleForAmazonEKS",
+        "arn:aws:iam::${account_id}:role/AWSServiceRoleForAmazonEKSNodegroup",
+        "arn:aws:iam::${account_id}:role/AWSServiceRoleForAutoScaling"
+      ]
+    },
+    {
+      "Sid": "CreateNetworkInsideTaggedVpc",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:CreateSubnet",
+        "ec2:CreateRouteTable"
+      ],
+      "Resource": "arn:aws:ec2:us-east-1:${account_id}:vpc/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "us-east-1",
+          "aws:ResourceTag/Project": "proyecto-devops-lab"
+        }
+      }
+    }
+  ]
+}
