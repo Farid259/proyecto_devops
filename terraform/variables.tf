@@ -34,3 +34,22 @@ variable "kubernetes_version" {
   type    = string
   default = "1.35"
 }
+
+variable "cd_principal_arn" {
+  description = "Rol IAM del CD; vacio deshabilita su acceso EKS."
+  type        = string
+  default     = ""
+  validation {
+    condition     = var.cd_principal_arn == "" || can(regex("^arn:aws:iam::[0-9]{12}:role/.+$", var.cd_principal_arn))
+    error_message = "Indicar un ARN de rol IAM o vacio."
+  }
+}
+variable "runner_cidr" {
+  description = "IP /32 temporal del runner; vacio fuera del CD."
+  type        = string
+  default     = ""
+  validation {
+    condition     = var.runner_cidr == "" || (can(cidrnetmask(var.runner_cidr)) && endswith(var.runner_cidr, "/32"))
+    error_message = "Indicar una IPv4 /32 o vacio."
+  }
+}

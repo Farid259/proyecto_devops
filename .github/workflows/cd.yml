@@ -1,0 +1,106 @@
+name: CD - AWS lab
+on:
+  workflow_call:
+    inputs:
+      image:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Para destruir escribir: proyecto-devops-lab'
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: aws-lab-terraform
+  cancel-in-progress: false
+jobs:
+  aws:
+    if: github.ref == 'refs/heads/main' && (github.event_name != 'workflow_dispatch' || inputs.confirmation == 'proyecto-devops-lab')
+    environment: aws-lab
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      TF_IN_AUTOMATION: 'true'
+      TF_INPUT: 'false'
+      TF_VAR_account_id: ${{ vars.AWS_ACCOUNT_ID }}
+      TF_VAR_admin_cidr: ${{ vars.ADMIN_CIDR }}
+      TF_VAR_admin_principal_arn: ${{ vars.ADMIN_PRINCIPAL_ARN }}
+      TF_VAR_cd_principal_arn: ${{ vars.AWS_ROLE_ARN }}
+      TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+      AWS_REGION: us-east-1
+      DEPLOY_IMAGE: ${{ inputs.image }}
+      LAB_ACTION: ${{ github.event_name == 'workflow_dispatch' && 'destroy' || 'deploy' }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Validar configuracion
+        shell: bash
+        run: |
+          set -euo pipefail
+          : "${TF_VAR_account_id:?Configurar AWS_ACCOUNT_ID}"
+          : "${TF_VAR_admin_cidr:?Configurar ADMIN_CIDR}"
+          : "${TF_VAR_admin_principal_arn:?Configurar ADMIN_PRINCIPAL_ARN}"
+          : "${TF_VAR_cd_principal_arn:?Configurar AWS_ROLE_ARN}"
+          : "${TF_STATE_BUCKET:?Configurar TF_STATE_BUCKET}"
+          test "$TF_STATE_BUCKET" = "proyecto-devops-state-${TF_VAR_account_id}-us-east-1"
+          if [ "$LAB_ACTION" = deploy ]; then
+            [[ "$DEPLOY_IMAGE" =~ ^ghcr.io/farid259/proyecto_devops@sha256:[a-f0-9]{64}$ ]]
+          fi
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+        with:
+          terraform_version: '1.14.7'
+          terraform_wrapper: false
+      - uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+          allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
+          role-session-name: github-${{ github.run_id }}
+      - name: Inicializar estado remoto
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f terraform/backend.tf || cp terraform/backend.tf.example terraform/backend.tf
+          terraform -chdir=terraform init -input=false -lockfile=readonly \
+            -backend-config="bucket=$TF_STATE_BUCKET" \
+            -backend-config="key=lab/terraform.tfstate" \
+            -backend-config="region=us-east-1" \
+            -backend-config="encrypt=true" -backend-config="use_lockfile=true"
+          test "$(terraform -chdir=terraform workspace show)" = default
+          terraform -chdir=terraform validate
+      - name: Desplegar o destruir laboratorio
+        id: lab
+        shell: bash
+        run: bash scripts/cd_aws.sh
+      - name: Retirar acceso temporal del runner
+        if: always() && steps.lab.outcome != 'skipped' && env.LAB_ACTION == 'deploy'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! aws eks describe-cluster --name proyecto-devops-lab > /tmp/cluster.json 2>/tmp/eks-error; then
+            if grep -q ResourceNotFoundException /tmp/eks-error; then exit 0; fi
+            cat /tmp/eks-error >&2
+            exit 1
+          fi
+          aws eks wait cluster-active --name proyecto-devops-lab
+          update=$(aws eks update-cluster-config --name proyecto-devops-lab \
+            --resources-vpc-config "publicAccessCidrs=$TF_VAR_admin_cidr" --query update.id --output text)
+          for attempt in {1..60}; do
+            status=$(aws eks describe-update --name proyecto-devops-lab --update-id "$update" --query update.status --output text)
+            if [ "$status" = Successful ]; then exit 0; fi
+            if [ "$status" = Failed ] || [ "$status" = Cancelled ]; then exit 1; fi
+            sleep 10
+          done
+          exit 1
+      - name: Recordatorio de costos
+        if: always()
+        shell: bash
+        run: |
+          echo 'Un despliegue fallido puede dejar recursos activos. Revisar AWS y ejecutar la destruccion manual al terminar.' >> "$GITHUB_STEP_SUMMARY"

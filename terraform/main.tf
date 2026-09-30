@@ -9,4 +9,6 @@ module "eks" {
   admin_cidr          = var.admin_cidr
   admin_principal_arn = var.admin_principal_arn
   kubernetes_version  = var.kubernetes_version
+  cd_principal_arn    = var.cd_principal_arn
+  runner_cidr         = var.runner_cidr
 }

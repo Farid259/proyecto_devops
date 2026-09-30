@@ -1,0 +1,99 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "StateBucketConfiguration",
+      "Effect": "Allow",
+      "Action": [
+        "s3:CreateBucket",
+        "s3:DeleteBucket",
+        "s3:GetBucketLocation",
+        "s3:GetBucketPolicy",
+        "s3:PutBucketPolicy",
+        "s3:DeleteBucketPolicy",
+        "s3:GetBucketPublicAccessBlock",
+        "s3:PutBucketPublicAccessBlock",
+        "s3:GetBucketVersioning",
+        "s3:PutBucketVersioning",
+        "s3:GetEncryptionConfiguration",
+        "s3:PutEncryptionConfiguration",
+        "s3:GetBucketTagging",
+        "s3:PutBucketTagging",
+        "s3:GetBucketAcl",
+        "s3:GetBucketCORS",
+        "s3:GetBucketWebsite",
+        "s3:GetBucketLogging",
+        "s3:GetBucketNotification",
+        "s3:GetAccelerateConfiguration",
+        "s3:GetBucketRequestPayment",
+        "s3:GetLifecycleConfiguration",
+        "s3:GetReplicationConfiguration",
+        "s3:GetBucketObjectLockConfiguration",
+        "s3:ListBucket"
+      ],
+      "Resource": "arn:aws:s3:::proyecto-devops-state-${account_id}-us-east-1"
+    },
+    {
+      "Sid": "LabState",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+      "Resource": "arn:aws:s3:::proyecto-devops-state-${account_id}-us-east-1/lab/terraform.tfstate"
+    },
+    {
+      "Sid": "LabStateLock",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": "arn:aws:s3:::proyecto-devops-state-${account_id}-us-east-1/lab/terraform.tfstate.tflock"
+    },
+    {
+      "Sid": "ManageCdRole",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole",
+        "iam:GetRole",
+        "iam:DeleteRole",
+        "iam:UpdateRole",
+        "iam:UpdateAssumeRolePolicy",
+        "iam:TagRole",
+        "iam:UntagRole",
+        "iam:ListRoleTags",
+        "iam:ListRolePolicies",
+        "iam:GetRolePolicy",
+        "iam:PutRolePolicy",
+        "iam:DeleteRolePolicy",
+        "iam:ListAttachedRolePolicies",
+        "iam:ListInstanceProfilesForRole"
+      ],
+      "Resource": "arn:aws:iam::${account_id}:role/proyecto-devops-github-cd"
+    },
+    {
+      "Sid": "DiscoverOidc",
+      "Effect": "Allow",
+      "Action": "iam:ListOpenIDConnectProviders",
+      "Resource": "*"
+    },
+    {
+      "Sid": "ManageGithubOidc",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateOpenIDConnectProvider",
+        "iam:GetOpenIDConnectProvider",
+        "iam:DeleteOpenIDConnectProvider",
+        "iam:AddClientIDToOpenIDConnectProvider",
+        "iam:RemoveClientIDFromOpenIDConnectProvider",
+        "iam:UpdateOpenIDConnectProviderThumbprint",
+        "iam:TagOpenIDConnectProvider",
+        "iam:UntagOpenIDConnectProvider",
+        "iam:ListOpenIDConnectProviderTags"
+      ],
+      "Resource": "arn:aws:iam::${account_id}:oidc-provider/token.actions.githubusercontent.com"
+    }
+  ]
+}

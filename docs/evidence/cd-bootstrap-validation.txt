@@ -1,0 +1,12 @@
+Preparacion CD - 2026-09-30
+terraform bootstrap init -backend=false: correcto, AWS provider 6.38.0.
+terraform bootstrap fmt -check y validate: correctos.
+terraform bootstrap plan: 9 to add, 0 to change, 0 to destroy.
+No se ejecuto apply; no se migro el estado local ni se creo EKS.
+AWS iam ListOpenIDConnectProviders: AccessDenied para devops-lab.
+Pendiente verificar proveedor existente y permisos de bootstrap antes de aplicar.
+GitHub aws-lab: required reviewer Farid259, prevent_self_review=false,
+custom branch policy main (branch), verificados por lectura API.
+Bypass de administradores: consultar estado en terraform/bootstrap/README.md.
+pytest -q -p no:cacheprovider: 26 passed.
+CD completo, OIDC efectivo y estado remoto: pendientes de activacion/verificacion.

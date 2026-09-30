@@ -196,3 +196,9 @@ El acceso elegido es un tunel local al Ingress remoto, sin balanceador AWS:
 [abrir, probar, cerrar y diagnosticar el tunel](../k8s/aws/README.md).
 
 Evidencia de cierre: [aws-destroy-validation.txt](../docs/evidence/aws-destroy-validation.txt).
+
+## Preparacion de CD
+
+Ver [bootstrap persistente: S3, OIDC y aprobacion](bootstrap/README.md).
+Configuracion preparada, pendiente de aplicar y migrar el estado.
+El laboratorio mantiene su backend actual hasta completar esa guia.

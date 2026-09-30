@@ -1,0 +1,7 @@
+2026-09-30: bootstrap apply complete, 9 added, 0 changed, 0 destroyed.
+OIDC previamente inexistente, creado junto con rol CD y bucket privado.
+Backend S3 configurado. Respaldo local: 0 recursos; state push correcto.
+state list remoto: vacio; bloqueo S3 adquirido y liberado.
+Variables AWS_ACCOUNT_ID, AWS_ROLE_ARN, TF_STATE_BUCKET, AWS_REGION,
+ADMIN_CIDR y ADMIN_PRINCIPAL_ARN configuradas y verificadas por API GitHub.
+CD_ENABLED=false. No se ejecuto workflow CD ni se creo EKS/EC2.

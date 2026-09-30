@@ -27,7 +27,7 @@ resource "aws_eks_cluster" "lab" {
     subnet_ids              = var.subnet_ids
     endpoint_private_access = true
     endpoint_public_access  = true
-    public_access_cidrs     = [var.admin_cidr]
+    public_access_cidrs     = distinct(compact([var.admin_cidr, var.runner_cidr]))
   }
   depends_on = [aws_iam_role_policy_attachment.cluster]
 }
@@ -73,3 +73,19 @@ resource "aws_eks_node_group" "lab" {
   depends_on = [aws_iam_role_policy_attachment.node]
 }
 output "cluster_name" { value = aws_eks_cluster.lab.name }
+
+variable "cd_principal_arn" { type = string }
+variable "runner_cidr" { type = string }
+resource "aws_eks_access_entry" "cd" {
+  count         = var.cd_principal_arn == "" ? 0 : 1
+  cluster_name  = aws_eks_cluster.lab.name
+  principal_arn = var.cd_principal_arn
+  type          = "STANDARD"
+}
+resource "aws_eks_access_policy_association" "cd" {
+  count         = var.cd_principal_arn == "" ? 0 : 1
+  cluster_name  = aws_eks_cluster.lab.name
+  principal_arn = aws_eks_access_entry.cd[0].principal_arn
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  access_scope { type = "cluster" }
+}

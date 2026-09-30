@@ -70,6 +70,8 @@ jobs:
   docker:
     name: Construir, probar, analizar DAST y publicar
     needs: [tests, sast]
+    outputs:
+      image: ${{ steps.publish.outputs.image }}
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     permissions:
@@ -159,12 +161,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Publicar la misma imagen validada
+        id: publish
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         shell: bash
         run: |
           docker push "$IMAGE:sha-$GITHUB_SHA"
           docker tag "$IMAGE:sha-$GITHUB_SHA" "$IMAGE:latest"
           docker push "$IMAGE:latest"
+          reference=$(docker inspect --format '{{index .RepoDigests 0}}' "$IMAGE:sha-$GITHUB_SHA")
+          [[ "$reference" =~ @sha256:[a-f0-9]{64}$ ]]
+          echo "image=$reference" >> "$GITHUB_OUTPUT"
           echo "Imagen publicada: $IMAGE:sha-$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
       - name: Guardar logs del contenedor
         if: always()
@@ -188,3 +194,14 @@ jobs:
             reports/container.log
             reports/container-inspect.json
           retention-days: 14
+
+  deploy:
+    name: CD AWS con aprobacion
+    needs: [docker]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.CD_ENABLED == 'true'
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/cd.yml
+    with:
+      image: ${{ needs.docker.outputs.image }}
