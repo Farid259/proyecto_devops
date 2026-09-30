@@ -5,10 +5,11 @@ API de conversion de temperaturas con FastAPI, sin frontend ni base de datos.
 ## Estado
 
 API, entorno virtual y 26 pruebas implementadas. Validado con Python 3.14.5 en Windows.
-Dockerfile implementado; construccion y ejecucion en Docker pendientes de validar.
-CI con GitHub Actions implementado; primera ejecucion remota pendiente.
-Terraform, Kubernetes, despliegue y dashboards pendientes de implementar.
-DAST incorporado al workflow; primer analisis remoto pendiente.
+Dockerfile multi-stage validado y publicada la imagen en GitHub Container Registry.
+CI con pruebas, SAST y DAST ejecutado correctamente en GitHub Actions (confirmado por el usuario).
+Kubernetes local implementado con kind, Traefik, Metrics Server y HPA.
+Terraform, despliegue cloud automatizado y dashboards pendientes de implementar.
+DAST con ZAP validado despues de corregir las cabeceras HTTP.
 
 ## Preparar el entorno en PowerShell
 
@@ -80,7 +81,8 @@ Invoke-RestMethod 'http://127.0.0.1:8000/health'
 - `tests/`: pruebas.
 - `docs/evidence/`: resultados y dependencias del entorno validado.
 - `.github/workflows/ci.yml`: pruebas, SAST, construccion y publicacion de imagen.
-- `k8s/`, `terraform/`, `monitoring/`: preparadas, aun sin implementar.
+- `k8s/`: manifiestos, configuracion local y guia de Kubernetes.
+- `terraform/`, `monitoring/`: preparadas, aun sin implementar.
 - `Dockerfile`: build multi-stage con etapas builder y runtime.
 
 El siguiente paso es construir y validar la imagen Docker. Luego agregaremos Kubernetes,
@@ -252,3 +254,26 @@ la documentacion, metricas y respuestas 404/422. Validacion local: 26 pruebas
 aprobadas y Bandit sin hallazgos. La cache local de pytest emitio una advertencia
 de escritura; las pruebas se ejecutaron correctamente. El nuevo resultado de
 ZAP queda pendiente de reconstruir y analizar la imagen mediante el pipeline.
+
+
+## Kubernetes local
+
+Guia completa: [k8s/README.md](k8s/README.md).
+El entorno se prepara con `python scripts/install_tools.py` y
+`powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start_local_k8s.ps1`.
+
+Una vez iniciado, abrir http://localhost:8080/docs y consultar el estado:
+
+```powershell
+$env:KUBECONFIG = "$PWD\.local\kubeconfig"
+.\.tools\kubectl.exe --context kind-proyecto-devops -n devops get pods,svc,ingress,hpa
+.\.tools\kubectl.exe --context kind-proyecto-devops -n devops top pods
+```
+
+Se usa kubectl local 1.35.8, compatible con el cluster. El kubectl incluido con Docker
+puede ser antiguo. `.tools/` y `.local/` estan excluidas de Git y de la imagen Docker.
+Kubeconfig contiene credenciales locales y no debe compartirse.
+
+La imagen se fija por digest de GHCR; Ingress usa Traefik. El HPA escala de 1 a 3
+replicas por CPU. Metrics Server permite el HPA; Prometheus y Grafana siguen pendientes.
+La guia explica los parches locales de cgroups v1 y certificados del kubelet.

@@ -39,3 +39,6 @@ Thumbs.db
 
 # Reportes temporales del pipeline
 reports/
+
+.tools/
+.local/

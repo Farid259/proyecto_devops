@@ -1,0 +1,796 @@
+{
+  "endpoints": {
+    "/health": {
+      "status": 200,
+      "nosniff": "nosniff"
+    },
+    "/api/convert?celsius=20": {
+      "status": 200,
+      "nosniff": "nosniff"
+    },
+    "/metrics": {
+      "status": 200,
+      "nosniff": "nosniff"
+    },
+    "/docs": {
+      "status": 200,
+      "nosniff": "nosniff"
+    }
+  },
+  "hpa_samples": [
+    {
+      "time_utc": "2026-09-30T01:11:42Z",
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-09-30T01:10:40Z",
+            "message": "the HPA controller was able to update the target scale to 3",
+            "reason": "SucceededRescale",
+            "status": "True",
+            "type": "AbleToScale"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:25Z",
+            "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+            "reason": "ValidMetricFound",
+            "status": "True",
+            "type": "ScalingActive"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:25Z",
+            "message": "the desired count is within the acceptable range",
+            "reason": "DesiredWithinRange",
+            "status": "False",
+            "type": "ScalingLimited"
+          }
+        ],
+        "currentMetrics": [
+          {
+            "resource": {
+              "current": {
+                "averageUtilization": 129,
+                "averageValue": "129m"
+              },
+              "name": "cpu"
+            },
+            "type": "Resource"
+          }
+        ],
+        "currentReplicas": 1,
+        "desiredReplicas": 3,
+        "lastScaleTime": "2026-09-30T01:11:40Z"
+      }
+    },
+    {
+      "time_utc": "2026-09-30T01:11:57Z",
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-09-30T01:10:40Z",
+            "message": "recommended size matches current size",
+            "reason": "ReadyForNewScale",
+            "status": "True",
+            "type": "AbleToScale"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:25Z",
+            "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+            "reason": "ValidMetricFound",
+            "status": "True",
+            "type": "ScalingActive"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:55Z",
+            "message": "the desired replica count is more than the maximum replica count",
+            "reason": "TooManyReplicas",
+            "status": "True",
+            "type": "ScalingLimited"
+          }
+        ],
+        "currentMetrics": [
+          {
+            "resource": {
+              "current": {
+                "averageUtilization": 500,
+                "averageValue": "500m"
+              },
+              "name": "cpu"
+            },
+            "type": "Resource"
+          }
+        ],
+        "currentReplicas": 3,
+        "desiredReplicas": 3,
+        "lastScaleTime": "2026-09-30T01:11:40Z"
+      }
+    },
+    {
+      "time_utc": "2026-09-30T01:12:13Z",
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-09-30T01:10:40Z",
+            "message": "recommended size matches current size",
+            "reason": "ReadyForNewScale",
+            "status": "True",
+            "type": "AbleToScale"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:25Z",
+            "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+            "reason": "ValidMetricFound",
+            "status": "True",
+            "type": "ScalingActive"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:55Z",
+            "message": "the desired replica count is more than the maximum replica count",
+            "reason": "TooManyReplicas",
+            "status": "True",
+            "type": "ScalingLimited"
+          }
+        ],
+        "currentMetrics": [
+          {
+            "resource": {
+              "current": {
+                "averageUtilization": 501,
+                "averageValue": "501m"
+              },
+              "name": "cpu"
+            },
+            "type": "Resource"
+          }
+        ],
+        "currentReplicas": 3,
+        "desiredReplicas": 3,
+        "lastScaleTime": "2026-09-30T01:11:40Z"
+      }
+    },
+    {
+      "time_utc": "2026-09-30T01:12:28Z",
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-09-30T01:10:40Z",
+            "message": "recommended size matches current size",
+            "reason": "ReadyForNewScale",
+            "status": "True",
+            "type": "AbleToScale"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:25Z",
+            "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+            "reason": "ValidMetricFound",
+            "status": "True",
+            "type": "ScalingActive"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:55Z",
+            "message": "the desired replica count is more than the maximum replica count",
+            "reason": "TooManyReplicas",
+            "status": "True",
+            "type": "ScalingLimited"
+          }
+        ],
+        "currentMetrics": [
+          {
+            "resource": {
+              "current": {
+                "averageUtilization": 324,
+                "averageValue": "324m"
+              },
+              "name": "cpu"
+            },
+            "type": "Resource"
+          }
+        ],
+        "currentReplicas": 3,
+        "desiredReplicas": 3,
+        "lastScaleTime": "2026-09-30T01:11:40Z"
+      }
+    },
+    {
+      "time_utc": "2026-09-30T01:12:43Z",
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-09-30T01:10:40Z",
+            "message": "recommended size matches current size",
+            "reason": "ReadyForNewScale",
+            "status": "True",
+            "type": "AbleToScale"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:25Z",
+            "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+            "reason": "ValidMetricFound",
+            "status": "True",
+            "type": "ScalingActive"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:55Z",
+            "message": "the desired replica count is more than the maximum replica count",
+            "reason": "TooManyReplicas",
+            "status": "True",
+            "type": "ScalingLimited"
+          }
+        ],
+        "currentMetrics": [
+          {
+            "resource": {
+              "current": {
+                "averageUtilization": 322,
+                "averageValue": "322m"
+              },
+              "name": "cpu"
+            },
+            "type": "Resource"
+          }
+        ],
+        "currentReplicas": 3,
+        "desiredReplicas": 3,
+        "lastScaleTime": "2026-09-30T01:11:40Z"
+      }
+    },
+    {
+      "time_utc": "2026-09-30T01:12:58Z",
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-09-30T01:10:40Z",
+            "message": "recommended size matches current size",
+            "reason": "ReadyForNewScale",
+            "status": "True",
+            "type": "AbleToScale"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:25Z",
+            "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+            "reason": "ValidMetricFound",
+            "status": "True",
+            "type": "ScalingActive"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:55Z",
+            "message": "the desired replica count is more than the maximum replica count",
+            "reason": "TooManyReplicas",
+            "status": "True",
+            "type": "ScalingLimited"
+          }
+        ],
+        "currentMetrics": [
+          {
+            "resource": {
+              "current": {
+                "averageUtilization": 324,
+                "averageValue": "324m"
+              },
+              "name": "cpu"
+            },
+            "type": "Resource"
+          }
+        ],
+        "currentReplicas": 3,
+        "desiredReplicas": 3,
+        "lastScaleTime": "2026-09-30T01:11:40Z"
+      }
+    },
+    {
+      "time_utc": "2026-09-30T01:13:13Z",
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-09-30T01:10:40Z",
+            "message": "recommended size matches current size",
+            "reason": "ReadyForNewScale",
+            "status": "True",
+            "type": "AbleToScale"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:25Z",
+            "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+            "reason": "ValidMetricFound",
+            "status": "True",
+            "type": "ScalingActive"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:55Z",
+            "message": "the desired replica count is more than the maximum replica count",
+            "reason": "TooManyReplicas",
+            "status": "True",
+            "type": "ScalingLimited"
+          }
+        ],
+        "currentMetrics": [
+          {
+            "resource": {
+              "current": {
+                "averageUtilization": 324,
+                "averageValue": "324m"
+              },
+              "name": "cpu"
+            },
+            "type": "Resource"
+          }
+        ],
+        "currentReplicas": 3,
+        "desiredReplicas": 3,
+        "lastScaleTime": "2026-09-30T01:11:40Z"
+      }
+    },
+    {
+      "time_utc": "2026-09-30T01:13:28Z",
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-09-30T01:10:40Z",
+            "message": "recommended size matches current size",
+            "reason": "ReadyForNewScale",
+            "status": "True",
+            "type": "AbleToScale"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:25Z",
+            "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+            "reason": "ValidMetricFound",
+            "status": "True",
+            "type": "ScalingActive"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:55Z",
+            "message": "the desired replica count is more than the maximum replica count",
+            "reason": "TooManyReplicas",
+            "status": "True",
+            "type": "ScalingLimited"
+          }
+        ],
+        "currentMetrics": [
+          {
+            "resource": {
+              "current": {
+                "averageUtilization": 322,
+                "averageValue": "322m"
+              },
+              "name": "cpu"
+            },
+            "type": "Resource"
+          }
+        ],
+        "currentReplicas": 3,
+        "desiredReplicas": 3,
+        "lastScaleTime": "2026-09-30T01:11:40Z"
+      }
+    },
+    {
+      "time_utc": "2026-09-30T01:13:43Z",
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-09-30T01:10:40Z",
+            "message": "recommended size matches current size",
+            "reason": "ReadyForNewScale",
+            "status": "True",
+            "type": "AbleToScale"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:25Z",
+            "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+            "reason": "ValidMetricFound",
+            "status": "True",
+            "type": "ScalingActive"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:55Z",
+            "message": "the desired replica count is more than the maximum replica count",
+            "reason": "TooManyReplicas",
+            "status": "True",
+            "type": "ScalingLimited"
+          }
+        ],
+        "currentMetrics": [
+          {
+            "resource": {
+              "current": {
+                "averageUtilization": 316,
+                "averageValue": "316m"
+              },
+              "name": "cpu"
+            },
+            "type": "Resource"
+          }
+        ],
+        "currentReplicas": 3,
+        "desiredReplicas": 3,
+        "lastScaleTime": "2026-09-30T01:11:40Z"
+      }
+    },
+    {
+      "time_utc": "2026-09-30T01:13:58Z",
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-09-30T01:10:40Z",
+            "message": "recommended size matches current size",
+            "reason": "ReadyForNewScale",
+            "status": "True",
+            "type": "AbleToScale"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:25Z",
+            "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+            "reason": "ValidMetricFound",
+            "status": "True",
+            "type": "ScalingActive"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:55Z",
+            "message": "the desired replica count is more than the maximum replica count",
+            "reason": "TooManyReplicas",
+            "status": "True",
+            "type": "ScalingLimited"
+          }
+        ],
+        "currentMetrics": [
+          {
+            "resource": {
+              "current": {
+                "averageUtilization": 321,
+                "averageValue": "321m"
+              },
+              "name": "cpu"
+            },
+            "type": "Resource"
+          }
+        ],
+        "currentReplicas": 3,
+        "desiredReplicas": 3,
+        "lastScaleTime": "2026-09-30T01:11:40Z"
+      }
+    },
+    {
+      "time_utc": "2026-09-30T01:14:14Z",
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-09-30T01:10:40Z",
+            "message": "recommended size matches current size",
+            "reason": "ReadyForNewScale",
+            "status": "True",
+            "type": "AbleToScale"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:25Z",
+            "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+            "reason": "ValidMetricFound",
+            "status": "True",
+            "type": "ScalingActive"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:55Z",
+            "message": "the desired replica count is more than the maximum replica count",
+            "reason": "TooManyReplicas",
+            "status": "True",
+            "type": "ScalingLimited"
+          }
+        ],
+        "currentMetrics": [
+          {
+            "resource": {
+              "current": {
+                "averageUtilization": 325,
+                "averageValue": "325m"
+              },
+              "name": "cpu"
+            },
+            "type": "Resource"
+          }
+        ],
+        "currentReplicas": 3,
+        "desiredReplicas": 3,
+        "lastScaleTime": "2026-09-30T01:11:40Z"
+      }
+    },
+    {
+      "time_utc": "2026-09-30T01:14:29Z",
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-09-30T01:10:40Z",
+            "message": "recommended size matches current size",
+            "reason": "ReadyForNewScale",
+            "status": "True",
+            "type": "AbleToScale"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:25Z",
+            "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+            "reason": "ValidMetricFound",
+            "status": "True",
+            "type": "ScalingActive"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:55Z",
+            "message": "the desired replica count is more than the maximum replica count",
+            "reason": "TooManyReplicas",
+            "status": "True",
+            "type": "ScalingLimited"
+          }
+        ],
+        "currentMetrics": [
+          {
+            "resource": {
+              "current": {
+                "averageUtilization": 326,
+                "averageValue": "326m"
+              },
+              "name": "cpu"
+            },
+            "type": "Resource"
+          }
+        ],
+        "currentReplicas": 3,
+        "desiredReplicas": 3,
+        "lastScaleTime": "2026-09-30T01:11:40Z"
+      }
+    },
+    {
+      "time_utc": "2026-09-30T01:14:44Z",
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-09-30T01:10:40Z",
+            "message": "recommended size matches current size",
+            "reason": "ReadyForNewScale",
+            "status": "True",
+            "type": "AbleToScale"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:25Z",
+            "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+            "reason": "ValidMetricFound",
+            "status": "True",
+            "type": "ScalingActive"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:55Z",
+            "message": "the desired replica count is more than the maximum replica count",
+            "reason": "TooManyReplicas",
+            "status": "True",
+            "type": "ScalingLimited"
+          }
+        ],
+        "currentMetrics": [
+          {
+            "resource": {
+              "current": {
+                "averageUtilization": 104,
+                "averageValue": "104m"
+              },
+              "name": "cpu"
+            },
+            "type": "Resource"
+          }
+        ],
+        "currentReplicas": 3,
+        "desiredReplicas": 3,
+        "lastScaleTime": "2026-09-30T01:11:40Z"
+      }
+    },
+    {
+      "time_utc": "2026-09-30T01:14:59Z",
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-09-30T01:10:40Z",
+            "message": "recent recommendations were higher than current one, applying the highest recent recommendation",
+            "reason": "ScaleDownStabilized",
+            "status": "True",
+            "type": "AbleToScale"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:25Z",
+            "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+            "reason": "ValidMetricFound",
+            "status": "True",
+            "type": "ScalingActive"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:14:55Z",
+            "message": "the desired count is within the acceptable range",
+            "reason": "DesiredWithinRange",
+            "status": "False",
+            "type": "ScalingLimited"
+          }
+        ],
+        "currentMetrics": [
+          {
+            "resource": {
+              "current": {
+                "averageUtilization": 3,
+                "averageValue": "3m"
+              },
+              "name": "cpu"
+            },
+            "type": "Resource"
+          }
+        ],
+        "currentReplicas": 3,
+        "desiredReplicas": 3,
+        "lastScaleTime": "2026-09-30T01:11:40Z"
+      }
+    },
+    {
+      "time_utc": "2026-09-30T01:15:14Z",
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-09-30T01:10:40Z",
+            "message": "recent recommendations were higher than current one, applying the highest recent recommendation",
+            "reason": "ScaleDownStabilized",
+            "status": "True",
+            "type": "AbleToScale"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:25Z",
+            "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+            "reason": "ValidMetricFound",
+            "status": "True",
+            "type": "ScalingActive"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:14:55Z",
+            "message": "the desired count is within the acceptable range",
+            "reason": "DesiredWithinRange",
+            "status": "False",
+            "type": "ScalingLimited"
+          }
+        ],
+        "currentMetrics": [
+          {
+            "resource": {
+              "current": {
+                "averageUtilization": 3,
+                "averageValue": "3m"
+              },
+              "name": "cpu"
+            },
+            "type": "Resource"
+          }
+        ],
+        "currentReplicas": 3,
+        "desiredReplicas": 3,
+        "lastScaleTime": "2026-09-30T01:11:40Z"
+      }
+    },
+    {
+      "time_utc": "2026-09-30T01:15:29Z",
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-09-30T01:10:40Z",
+            "message": "recent recommendations were higher than current one, applying the highest recent recommendation",
+            "reason": "ScaleDownStabilized",
+            "status": "True",
+            "type": "AbleToScale"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:25Z",
+            "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+            "reason": "ValidMetricFound",
+            "status": "True",
+            "type": "ScalingActive"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:14:55Z",
+            "message": "the desired count is within the acceptable range",
+            "reason": "DesiredWithinRange",
+            "status": "False",
+            "type": "ScalingLimited"
+          }
+        ],
+        "currentMetrics": [
+          {
+            "resource": {
+              "current": {
+                "averageUtilization": 3,
+                "averageValue": "3m"
+              },
+              "name": "cpu"
+            },
+            "type": "Resource"
+          }
+        ],
+        "currentReplicas": 3,
+        "desiredReplicas": 3,
+        "lastScaleTime": "2026-09-30T01:11:40Z"
+      }
+    },
+    {
+      "time_utc": "2026-09-30T01:15:44Z",
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-09-30T01:10:40Z",
+            "message": "the HPA controller was able to update the target scale to 1",
+            "reason": "SucceededRescale",
+            "status": "True",
+            "type": "AbleToScale"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:25Z",
+            "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+            "reason": "ValidMetricFound",
+            "status": "True",
+            "type": "ScalingActive"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:14:55Z",
+            "message": "the desired count is within the acceptable range",
+            "reason": "DesiredWithinRange",
+            "status": "False",
+            "type": "ScalingLimited"
+          }
+        ],
+        "currentMetrics": [
+          {
+            "resource": {
+              "current": {
+                "averageUtilization": 3,
+                "averageValue": "3m"
+              },
+              "name": "cpu"
+            },
+            "type": "Resource"
+          }
+        ],
+        "currentReplicas": 3,
+        "desiredReplicas": 1,
+        "lastScaleTime": "2026-09-30T01:15:40Z"
+      }
+    },
+    {
+      "time_utc": "2026-09-30T01:15:59Z",
+      "status": {
+        "conditions": [
+          {
+            "lastTransitionTime": "2026-09-30T01:10:40Z",
+            "message": "recommended size matches current size",
+            "reason": "ReadyForNewScale",
+            "status": "True",
+            "type": "AbleToScale"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:11:25Z",
+            "message": "the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)",
+            "reason": "ValidMetricFound",
+            "status": "True",
+            "type": "ScalingActive"
+          },
+          {
+            "lastTransitionTime": "2026-09-30T01:14:55Z",
+            "message": "the desired count is within the acceptable range",
+            "reason": "DesiredWithinRange",
+            "status": "False",
+            "type": "ScalingLimited"
+          }
+        ],
+        "currentMetrics": [
+          {
+            "resource": {
+              "current": {
+                "averageUtilization": 3,
+                "averageValue": "3m"
+              },
+              "name": "cpu"
+            },
+            "type": "Resource"
+          }
+        ],
+        "currentReplicas": 1,
+        "desiredReplicas": 1,
+        "lastScaleTime": "2026-09-30T01:15:40Z"
+      }
+    }
+  ]
+}

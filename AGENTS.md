@@ -17,3 +17,10 @@
 
 - DAST: ejecutar ZAP API Scan contra la API temporal del runner antes de publicar; WARN, FAIL y errores bloquean la imagen.
 - Guardar reportes ZAP como artifacts incluso cuando el escaneo falle; no ignorar alertas sin justificar la regla concreta.
+
+- Kubernetes local: cluster kind `proyecto-devops`, contexto `kind-proyecto-devops`, namespace `devops`.
+- Usar `.tools/kubectl.exe --kubeconfig .local/kubeconfig --context kind-proyecto-devops`; no tocar otros clusters.
+- Aplicar la API con `kubectl apply -k k8s`; Ingress local http://localhost:8080.
+- Mantener imagen por digest y requests de CPU para el HPA. No incluir replicas fijas en el Deployment gestionado por HPA.
+- Los parches de compatibilidad cgroups v1 y kubelet-insecure-tls son solo para el laboratorio local, no para cloud.
+- No versionar `.tools/` ni `.local/`; las credenciales del cluster estan en `.local/kubeconfig`.

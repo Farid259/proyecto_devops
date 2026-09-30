@@ -1,0 +1,53 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: api-load-test
+  namespace: devops
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 240
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: load
+          image: ghcr.io/farid259/proyecto_devops@sha256:b41046eaf2c29af9aa43152163571ef3bc2fbc8e1590a46070e920438c63fa19
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: '1'
+              memory: 128Mi
+          command: [python, -u, -c]
+          args:
+            - |
+              from concurrent.futures import ThreadPoolExecutor
+              from time import monotonic
+              from urllib.request import urlopen
+              deadline = monotonic() + 180
+              def send_requests(_):
+                  ok = errors = 0
+                  while monotonic() < deadline:
+                      try:
+                          with urlopen('http://api/api/convert?celsius=20', timeout=5) as r:
+                              r.read()
+                              ok += 1
+                      except Exception:
+                          errors += 1
+                  return ok, errors
+              with ThreadPoolExecutor(max_workers=16) as pool:
+                  results = list(pool.map(send_requests, range(16)))
+              print({'requests_ok': sum(r[0] for r in results), 'errors': sum(r[1] for r in results)})

@@ -26,3 +26,7 @@ README.md
 
 requirements-security.txt
 reports
+
+.tools
+.local
+scripts
