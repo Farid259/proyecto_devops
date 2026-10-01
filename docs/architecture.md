@@ -299,8 +299,8 @@ Comprobar que destroy termino y no quedan recursos facturables del laboratorio.
 El bootstrap tiene ciclo de vida separado. S3 puede seguir generando cargos por
 almacenamiento y solicitudes. Poner CD_ENABLED=false evita futuras llamadas de
 CI a deploy; no destruye lo que ya este activo ni bloquea el workflow de destroy.
-No hay aun apagado programado, presupuesto que corte el consumo ni garantia de
-costo maximo. EKS y EC2 generan cargos mientras existen, aunque no haya trafico.
+Por decision de alcance, el operador inicia la destruccion manual desde Actions
+al terminar las pruebas. No hay apagado programado ni garantia de costo maximo. EKS y EC2 generan cargos mientras existen, aunque no haya trafico.
 
 ## 10. Validacion y siguientes mejoras
 
@@ -309,8 +309,7 @@ local reproducible en [monitoring-local.txt](evidence/monitoring-local.txt).
 No extrapolar esa evidencia a AWS: registrar la ejecucion CD con monitoreo y
 capturas del entorno remoto antes de afirmar su validacion completa.
 
-Pendientes: cierre automatico FinOps, evidencia final AWS de monitoreo, informe
-final. Para evolucionar a produccion: autenticacion, aislamiento de red, permisos
+Pendientes de entrega: reunir las evidencias finales e informe final. Para evolucionar a produccion: autenticacion, aislamiento de red, permisos
 Kubernetes mas acotados, persistencia/backup de observabilidad, disponibilidad
 multinodo, notificaciones externas y analisis de dependencias/imagenes.
 

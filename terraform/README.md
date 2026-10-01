@@ -91,10 +91,10 @@ Apagar EC2 no detiene la facturacion de EKS. No borrar el estado antes de destru
 Si apply falla parcialmente, los recursos creados pueden seguir cobrando: revisar
 el estado y destruir. Los presupuestos con alertas no frenan automaticamente el gasto.
 
-Estado local para esta primera etapa: terraform.tfstate y planes quedan fuera de Git.
-Versionar .terraform.lock.hcl. Antes de automatizar Terraform desde CI, configurar
-backend S3 cifrado, versionado y bloqueo use_lockfile; migrar el estado. El backend
-remoto, el despliegue CD y el cierre automatico FinOps todavia estan pendientes.
+El laboratorio usa estado remoto en S3 cifrado, versionado y bloqueo use_lockfile.
+Los planes y respaldos locales quedan fuera de Git; versionar .terraform.lock.hcl.
+El CD despliega con aprobacion y permite iniciar la destruccion manual desde
+Actions. Este es el mecanismo de cierre elegido; no se incluye apagado programado.
 
 Referencias:
 - https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html

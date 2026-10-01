@@ -88,8 +88,9 @@ Invoke-RestMethod 'http://127.0.0.1:8000/health'
 - `.github/workflows/cd.yml`: despliegue con aprobacion y destruccion manual.
 - `Dockerfile`: build multi-stage con etapas builder y runtime.
 
-Siguientes etapas: registrar evidencia del monitoreo en AWS, cierre automatico
-FinOps e informe final. Consultar el alcance en la guia de arquitectura.
+Siguientes etapas: reunir las evidencias e informe final. El control de costos
+usa aprobacion de despliegue y destruccion manual desde Actions. Consultar el
+alcance en la guia de arquitectura.
 
 Referencias: [FastAPI testing](https://fastapi.tiangolo.com/tutorial/testing/)
 y [Prometheus Python](https://prometheus.github.io/client_python/).
@@ -291,7 +292,8 @@ Incluye modulos de red y EKS, un nodo y acceso administrativo limitado a una IP.
 Infraestructura AWS desplegada, API verificada y laboratorio eliminado al terminar. Acceso usado durante la prueba:
 http://localhost:18080/docs. [Guia de acceso AWS](k8s/aws/README.md).
 El estado remoto en S3 y la destruccion manual desde CD estan implementados.
-El cierre automatico programado sigue pendiente.
+El cierre se inicia manualmente desde Actions; no se implementa un horario de
+apagado automatico como parte del alcance elegido.
 Cerrar el tunel no elimina el laboratorio ni detiene sus cargos.
 
 Evidencia de cierre: [aws-destroy-validation.txt](docs/evidence/aws-destroy-validation.txt).
