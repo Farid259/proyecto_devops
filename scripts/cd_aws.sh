@@ -59,3 +59,12 @@ with urlopen('http://localhost:18080/api/convert?celsius=20',timeout=10) as r:
  assert json.load(r)=={'celsius':20.0,'fahrenheit':68.0,'kelvin':293.15}
 PYTHON
 printf 'API AWS verificada. Imagen: `%s`. Acceso manual: k8s/aws/README.md.\n' "$DEPLOY_IMAGE" >> "$GITHUB_STEP_SUMMARY"
+
+# Mismo monitoreo en AWS que en kind, usando DNS interno de este cluster.
+kubectl --context proyecto-devops-aws apply -k monitoring
+kubectl --context proyecto-devops-aws -n monitoring rollout status deployment/prometheus --timeout=5m
+kubectl --context proyecto-devops-aws -n monitoring rollout status deployment/grafana --timeout=5m
+kubectl --context proyecto-devops-aws -n monitoring exec deployment/prometheus -- promtool check config /etc/prometheus/prometheus.yml
+
+kubectl --context proyecto-devops-aws -n monitoring exec deployment/prometheus -- promtool test rules /etc/prometheus/alerts.test.yml
+python3 scripts/verify_monitoring.py --kubeconfig "$KUBECONFIG" --context proyecto-devops-aws

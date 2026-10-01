@@ -39,3 +39,8 @@ Invoke-Checked $kubectl ($kargs + @('-n','devops','rollout','status','deployment
 Invoke-Checked $kubectl ($kargs + @('-n','devops','get','pods,svc,ingress,hpa'))
 Write-Host 'API: http://localhost:8080/docs'
 Write-Host "Kubeconfig local: $kubeconfig (no modifica el contexto global)."
+
+Invoke-Checked $kubectl ($kargs + @('apply','-k',(Join-Path $projectRoot 'monitoring')))
+Invoke-Checked $kubectl ($kargs + @('-n','monitoring','rollout','status','deployment/prometheus','--timeout=300s'))
+Invoke-Checked $kubectl ($kargs + @('-n','monitoring','rollout','status','deployment/grafana','--timeout=300s'))
+Write-Host 'Monitoreo instalado. Acceso por tunel: monitoring/README.md'

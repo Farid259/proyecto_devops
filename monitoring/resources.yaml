@@ -1,0 +1,345 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "Namespace",
+      "metadata": {
+        "name": "monitoring"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "api-metrics",
+        "namespace": "devops"
+      },
+      "spec": {
+        "clusterIP": "None",
+        "publishNotReadyAddresses": true,
+        "selector": {
+          "app": "devops-api"
+        },
+        "ports": [
+          {
+            "name": "metrics",
+            "port": 8000,
+            "targetPort": 8000
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "prometheus",
+        "namespace": "monitoring"
+      },
+      "spec": {
+        "replicas": 1,
+        "strategy": {
+          "type": "Recreate"
+        },
+        "selector": {
+          "matchLabels": {
+            "app": "prometheus"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "prometheus"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 65534,
+              "fsGroup": 65534,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "containers": [
+              {
+                "name": "prometheus",
+                "image": "prom/prometheus:v3.15.0",
+                "ports": [
+                  {
+                    "containerPort": 9090
+                  }
+                ],
+                "args": [
+                  "--config.file=/etc/prometheus/prometheus.yml",
+                  "--storage.tsdb.path=/prometheus",
+                  "--storage.tsdb.retention.time=24h",
+                  "--storage.tsdb.retention.size=512MB"
+                ],
+                "env": [],
+                "volumeMounts": [
+                  {
+                    "name": "config",
+                    "mountPath": "/etc/prometheus",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "data",
+                    "mountPath": "/prometheus"
+                  },
+                  {
+                    "name": "tmp",
+                    "mountPath": "/tmp"
+                  }
+                ],
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "512Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/-/ready",
+                    "port": 9090
+                  },
+                  "initialDelaySeconds": 10,
+                  "periodSeconds": 5
+                }
+              }
+            ],
+            "volumes": [
+              {
+                "name": "config",
+                "configMap": {
+                  "name": "prometheus-config"
+                }
+              },
+              {
+                "name": "data",
+                "emptyDir": {
+                  "sizeLimit": "1Gi"
+                }
+              },
+              {
+                "name": "tmp",
+                "emptyDir": {
+                  "sizeLimit": "64Mi"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "prometheus",
+        "namespace": "monitoring"
+      },
+      "spec": {
+        "selector": {
+          "app": "prometheus"
+        },
+        "ports": [
+          {
+            "port": 9090,
+            "targetPort": 9090
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "grafana",
+        "namespace": "monitoring"
+      },
+      "spec": {
+        "replicas": 1,
+        "strategy": {
+          "type": "Recreate"
+        },
+        "selector": {
+          "matchLabels": {
+            "app": "grafana"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "grafana"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 472,
+              "fsGroup": 472,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "containers": [
+              {
+                "name": "grafana",
+                "image": "grafana/grafana:13.2.3",
+                "ports": [
+                  {
+                    "containerPort": 3000
+                  }
+                ],
+                "args": [],
+                "env": [
+                  {
+                    "name": "GF_AUTH_ANONYMOUS_ENABLED",
+                    "value": "true"
+                  },
+                  {
+                    "name": "GF_AUTH_ANONYMOUS_ORG_ROLE",
+                    "value": "Viewer"
+                  },
+                  {
+                    "name": "GF_AUTH_DISABLE_LOGIN_FORM",
+                    "value": "true"
+                  },
+                  {
+                    "name": "GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION",
+                    "value": "true"
+                  },
+                  {
+                    "name": "GF_ANALYTICS_REPORTING_ENABLED",
+                    "value": "false"
+                  },
+                  {
+                    "name": "GF_ANALYTICS_CHECK_FOR_UPDATES",
+                    "value": "false"
+                  }
+                ],
+                "volumeMounts": [
+                  {
+                    "name": "provisioning",
+                    "mountPath": "/etc/grafana/provisioning/datasources/datasources.yml",
+                    "subPath": "datasources.yml",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "provisioning",
+                    "mountPath": "/etc/grafana/provisioning/dashboards/dashboards.yml",
+                    "subPath": "dashboards.yml",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "dashboard",
+                    "mountPath": "/var/lib/grafana/dashboards",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "data",
+                    "mountPath": "/var/lib/grafana"
+                  },
+                  {
+                    "name": "tmp",
+                    "mountPath": "/tmp"
+                  }
+                ],
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "256Mi"
+                  },
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "768Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "readOnlyRootFilesystem": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/api/health",
+                    "port": 3000
+                  },
+                  "initialDelaySeconds": 10,
+                  "periodSeconds": 5
+                }
+              }
+            ],
+            "volumes": [
+              {
+                "name": "provisioning",
+                "configMap": {
+                  "name": "grafana-provisioning"
+                }
+              },
+              {
+                "name": "dashboard",
+                "configMap": {
+                  "name": "grafana-dashboard"
+                }
+              },
+              {
+                "name": "data",
+                "emptyDir": {
+                  "sizeLimit": "2Gi"
+                }
+              },
+              {
+                "name": "tmp",
+                "emptyDir": {
+                  "sizeLimit": "64Mi"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "grafana",
+        "namespace": "monitoring"
+      },
+      "spec": {
+        "selector": {
+          "app": "grafana"
+        },
+        "ports": [
+          {
+            "port": 3000,
+            "targetPort": 3000
+          }
+        ]
+      }
+    }
+  ]
+}

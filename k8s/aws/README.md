@@ -127,3 +127,7 @@ Terraform administra infraestructura; kubectl/Helm instalaron API, Metrics Serve
 y Traefik. Prometheus/Grafana y la prueba de carga en AWS siguen pendientes.
 
 Evidencia de cierre: [aws-destroy-validation.txt](../../docs/evidence/aws-destroy-validation.txt).
+
+## Monitoreo del despliegue
+
+CD instala Prometheus y Grafana dentro de EKS. Acceso y limitaciones: [monitoreo](../../monitoring/README.md).

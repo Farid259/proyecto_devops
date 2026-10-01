@@ -291,3 +291,7 @@ El estado remoto y la automatizacion de cierre siguen pendientes.
 Cerrar el tunel no elimina el laboratorio ni detiene sus cargos.
 
 Evidencia de cierre: [aws-destroy-validation.txt](docs/evidence/aws-destroy-validation.txt).
+
+## Monitoreo
+
+Prometheus y Grafana integrados al despliegue local y al CD: [guia](monitoring/README.md).

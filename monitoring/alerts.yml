@@ -1,0 +1,31 @@
+{
+  "groups": [
+    {
+      "name": "api",
+      "rules": [
+        {
+          "alert": "ApiUnavailable",
+          "expr": "sum(up{job=\"api\"}) == 0 or absent(up{job=\"api\"})",
+          "for": "1m",
+          "labels": {
+            "severity": "critical"
+          },
+          "annotations": {
+            "summary": "No hay instancias disponibles de la API"
+          }
+        },
+        {
+          "alert": "ApiHighErrorRate",
+          "expr": "sum(rate(http_requests_total{job=\"api\",status=~\"5..\"}[5m])) / clamp_min(sum(rate(http_requests_total{job=\"api\"}[5m])), 0.001) > 0.05",
+          "for": "2m",
+          "labels": {
+            "severity": "warning"
+          },
+          "annotations": {
+            "summary": "Mas de 5% de respuestas 5xx"
+          }
+        }
+      ]
+    }
+  ]
+}

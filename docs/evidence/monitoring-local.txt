@@ -1,0 +1,9 @@
+UTC: 2026-10-01T00:58:34.298079+00:00
+Cluster: kind-proyecto-devops (local). Sin despliegue AWS.
+Prometheus v3.15.0, Grafana 13.2.3.
+Promtool check config: SUCCESS; 2 reglas validas.
+Promtool test rules: SUCCESS (ApiUnavailable firing al minuto y resuelta a los 2 minutos, series simuladas).
+verify_monitoring.py: api_targets_up=1, dashboard=DevOps API, grafana_query=OK.
+La prueba verifica consulta Grafana -> Prometheus -> scraping real de la API.
+No se envio ninguna notificacion externa; alertas visibles en Prometheus.
+Ajustes tras validacion: Grafana RAM limite 768Mi y emptyDir 2Gi para plugins; usuario no root.

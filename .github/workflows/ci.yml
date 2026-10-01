@@ -37,6 +37,19 @@ jobs:
             terraform -chdir="$directory" validate
           done
 
+  monitoring:
+    name: Validar Prometheus y alertas
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Comprobar configuracion y caida/recuperacion simulada
+        run: |
+          docker run --rm --entrypoint promtool -v "$PWD/monitoring:/etc/prometheus:ro" prom/prometheus:v3.15.0 check config /etc/prometheus/prometheus.yml
+          docker run --rm --entrypoint promtool -v "$PWD/monitoring:/etc/prometheus:ro" prom/prometheus:v3.15.0 test rules /etc/prometheus/alerts.test.yml
+
   tests:
     name: Pruebas Python
     runs-on: ubuntu-24.04
@@ -91,7 +104,7 @@ jobs:
 
   docker:
     name: Construir, probar, analizar DAST y publicar
-    needs: [tests, sast, terraform]
+    needs: [tests, sast, terraform, monitoring]
     outputs:
       image: ${{ steps.publish.outputs.image }}
     runs-on: ubuntu-24.04
