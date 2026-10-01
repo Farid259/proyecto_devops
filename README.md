@@ -8,7 +8,8 @@ API, entorno virtual y 26 pruebas implementadas. Validado con Python 3.14.5 en W
 Dockerfile multi-stage validado y publicada la imagen en GitHub Container Registry.
 CI con pruebas, SAST y DAST ejecutado correctamente en GitHub Actions (confirmado por el usuario).
 Kubernetes local implementado con kind, Traefik, Metrics Server y HPA.
-Terraform, despliegue cloud automatizado y dashboards pendientes de implementar.
+Terraform con backend S3, CD con OIDC/aprobacion y monitoreo implementados.
+Arquitectura detallada: [componentes, diagramas y ciclo de vida](docs/architecture.md).
 DAST con ZAP validado despues de corregir las cabeceras HTTP.
 
 ## Preparar el entorno en PowerShell
@@ -82,11 +83,13 @@ Invoke-RestMethod 'http://127.0.0.1:8000/health'
 - `docs/evidence/`: resultados y dependencias del entorno validado.
 - `.github/workflows/ci.yml`: pruebas, SAST, construccion y publicacion de imagen.
 - `k8s/`: manifiestos, configuracion local y guia de Kubernetes.
-- `terraform/`, `monitoring/`: preparadas, aun sin implementar.
+- `terraform/`: bootstrap persistente, red y EKS temporal.
+- `monitoring/`: Prometheus, Grafana, dashboard y reglas de alerta.
+- `.github/workflows/cd.yml`: despliegue con aprobacion y destruccion manual.
 - `Dockerfile`: build multi-stage con etapas builder y runtime.
 
-El siguiente paso es construir y validar la imagen Docker. Luego agregaremos Kubernetes,
-Terraform, CI/CD, SAST/DAST, monitoreo, configuraciones de costos e informe final.
+Siguientes etapas: registrar evidencia del monitoreo en AWS, cierre automatico
+FinOps e informe final. Consultar el alcance en la guia de arquitectura.
 
 Referencias: [FastAPI testing](https://fastapi.tiangolo.com/tutorial/testing/)
 y [Prometheus Python](https://prometheus.github.io/client_python/).
@@ -138,9 +141,7 @@ docker rm proyecto-devops-local
 - `.dockerignore` excluye .venv, Git, configuraciones locales y archivos sensibles.
 - El entorno virtual local de Windows no se copia a la imagen Linux.
 
-Estado de validacion: no se pudo construir ni arrancar la imagen desde la sesion
-asistida por falta de acceso al motor Docker de Windows. Los comandos anteriores
-quedan pendientes de ejecutar en la terminal del usuario.
+Estado: imagen construida y probada en el CI, publicada en GHCR y desplegada en Kubernetes.
 
 Referencias: [builds multi-stage](https://docs.docker.com/get-started/docker-concepts/building-images/multi-stage-builds/)
 y [imagen oficial de Python](https://hub.docker.com/_/python).
@@ -149,11 +150,13 @@ y [imagen oficial de Python](https://hub.docker.com/_/python).
 ## GitHub Actions: CI y publicacion de imagen
 
 El workflow `.github/workflows/ci.yml` se ejecuta en pushes a `main`, pull requests
-hacia `main` y manualmente desde Actions. Incluye tres jobs:
+hacia `main` y manualmente desde Actions. Incluye:
 
 1. **tests**: instala dependencias, comprueba compatibilidad y ejecuta pytest.
 2. **sast**: ejecuta Bandit sobre `app/`; cualquier hallazgo hace fallar el job.
-3. **docker**: requiere los dos anteriores, construye la imagen, espera el healthcheck,
+3. **terraform**: valida formato, proveedores y configuracion en Linux sin backend.
+4. **monitoring**: valida configuracion y reglas con promtool.
+5. **docker**: requiere los cuatro anteriores, construye la imagen, espera el healthcheck,
    comprueba endpoints y UID 10001, ejecuta DAST y publica exactamente esa imagen validada.
 
 La publicacion solo ocurre en pushes a `main`. Los pull requests y ejecuciones
@@ -162,15 +165,16 @@ La autenticacion usa el `GITHUB_TOKEN` automatico con `packages: write` en el jo
 Docker; no se necesita crear un token personal ni una cuenta de Docker Hub.
 
 Imagen: `ghcr.io/farid259/proyecto_devops`.
-Etiquetas: `sha-<SHA completo del commit>` y `latest`. Para futuros despliegues,
-preferir la etiqueta del commit o el digest en lugar de `latest`.
+Etiquetas: `sha-<SHA completo del commit>` y `latest`. El CD recibe el digest
+de la misma imagen validada por esa ejecucion. Si CD_ENABLED=true en un push a
+main, solicita aprobacion en aws-lab y despliega. Ver [arquitectura](docs/architecture.md).
 
 ### Primera ejecucion
 
 Subir los cambios a `main` y abrir:
 https://github.com/Farid259/proyecto_devops/actions
 
-Revisar que los tres jobs terminen correctamente. Cada ejecucion guarda artifacts
+Revisar que todos los jobs de validacion terminen correctamente. Cada ejecucion guarda artifacts
 con el reporte pytest, reporte JSON de Bandit y logs/inspeccion del contenedor
 por 14 dias. Descargar los necesarios para el informe antes de que caduquen.
 La imagen aparecera en Packages del perfil/repositorio al publicarse.
@@ -194,8 +198,8 @@ Bandit analiza patrones de seguridad del codigo Python. No reemplaza DAST ni un
 analisis de vulnerabilidades de dependencias o de la imagen. DAST se ejecuta
 con ZAP como se describe a continuacion; los otros analisis quedan pendientes.
 
-Validacion local de esta etapa: 18 pruebas aprobadas y Bandit sin hallazgos.
-La ejecucion completa del workflow y la publicacion en GHCR requieren el primer push.
+Validacion: 26 pruebas y CI con publicacion ejecutado. Las evidencias historicas
+se conservan en docs/evidence con el alcance de cada ejecucion.
 
 Referencia: https://docs.github.com/en/actions/tutorials/publish-packages/publish-docker-images
 
@@ -235,8 +239,7 @@ El artifact `zap-results` conserva `report.html`, `report.json` y `report.md` du
 consultar los logs del paso. Los logs de la API siguen en `docker-results`.
 Descargar los reportes desde la ejecucion en Actions para el informe final.
 
-Estado: workflow validado estaticamente; ejecucion real pendiente en GitHub Actions
-porque esta sesion no tiene acceso al motor Docker local.
+Estado: DAST ejecutado en CI; consultar los artifacts de cada ejecucion.
 
 Referencia: https://www.zaproxy.org/docs/docker/api-scan/
 
@@ -252,8 +255,7 @@ Si se incorpora un frontend en otro origen, revisar esta politica junto con CORS
 Las pruebas comprueban ambas cabeceras en los endpoints informados por ZAP,
 la documentacion, metricas y respuestas 404/422. Validacion local: 26 pruebas
 aprobadas y Bandit sin hallazgos. La cache local de pytest emitio una advertencia
-de escritura; las pruebas se ejecutaron correctamente. El nuevo resultado de
-ZAP queda pendiente de reconstruir y analizar la imagen mediante el pipeline.
+de escritura; las pruebas se ejecutaron correctamente. ZAP paso posteriormente en el pipeline tras corregir las cabeceras.
 
 
 ## Kubernetes local
@@ -275,19 +277,21 @@ puede ser antiguo. `.tools/` y `.local/` estan excluidas de Git y de la imagen D
 Kubeconfig contiene credenciales locales y no debe compartirse.
 
 La imagen se fija por digest de GHCR; Ingress usa Traefik. El HPA escala de 1 a 3
-replicas por CPU. Metrics Server permite el HPA; Prometheus y Grafana siguen pendientes.
+replicas por CPU. Metrics Server permite el HPA; Prometheus y Grafana estan implementados en monitoring/.
 La guia explica los parches locales de cgroups v1 y certificados del kubelet.
 
 
 ## AWS con Terraform
 
-> Estado actual: laboratorio AWS destruido y verificado el 2026-09-30. El acceso por tunel ya no esta disponible. Las instrucciones se conservan para un futuro despliegue.
+> El laboratorio es temporal. Las evidencias de despliegue/destruccion son historicas;
+> verificar la ultima ejecucion de CD para conocer su estado operativo actual.
 
 Configuracion del laboratorio temporal en [terraform/README.md](terraform/README.md).
 Incluye modulos de red y EKS, un nodo y acceso administrativo limitado a una IP.
 Infraestructura AWS desplegada, API verificada y laboratorio eliminado al terminar. Acceso usado durante la prueba:
 http://localhost:18080/docs. [Guia de acceso AWS](k8s/aws/README.md).
-El estado remoto y la automatizacion de cierre siguen pendientes.
+El estado remoto en S3 y la destruccion manual desde CD estan implementados.
+El cierre automatico programado sigue pendiente.
 Cerrar el tunel no elimina el laboratorio ni detiene sus cargos.
 
 Evidencia de cierre: [aws-destroy-validation.txt](docs/evidence/aws-destroy-validation.txt).

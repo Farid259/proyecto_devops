@@ -216,3 +216,7 @@ el proveedor, regenerarlos antes de hacer commit:
 CI ejecuta init -backend=false -lockfile=readonly y validate en Linux para ambos
 roots, sin credenciales AWS. No quitar la comprobacion de checksums para evitar
 un error de instalacion. Evidencia: [correccion Linux](../docs/evidence/cd-checksum-fix.txt).
+
+## Arquitectura general
+
+Ver [diagramas, flujo CI/CD, seguridad y ciclo de vida](../docs/architecture.md).

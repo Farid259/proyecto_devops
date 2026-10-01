@@ -131,3 +131,7 @@ Evidencia de cierre: [aws-destroy-validation.txt](../../docs/evidence/aws-destro
 ## Monitoreo del despliegue
 
 CD instala Prometheus y Grafana dentro de EKS. Acceso y limitaciones: [monitoreo](../../monitoring/README.md).
+
+## Arquitectura general
+
+Ver [diagramas, flujo CI/CD, seguridad y ciclo de vida](../../docs/architecture.md).

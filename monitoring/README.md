@@ -64,3 +64,7 @@ Destruir EKS elimina estos pods. No se aprovisionan discos EBS adicionales.
 Referencias:
 - https://prometheus.io/docs/prometheus/latest/configuration/configuration/
 - https://grafana.com/docs/grafana/latest/administration/provisioning/
+
+## Arquitectura general
+
+Ver [diagramas, flujo CI/CD, seguridad y ciclo de vida](../docs/architecture.md).
