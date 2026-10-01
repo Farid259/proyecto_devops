@@ -68,3 +68,49 @@ Referencias:
 ## Arquitectura general
 
 Ver [diagramas, flujo CI/CD, seguridad y ciclo de vida](../docs/architecture.md).
+
+## Conexion automatica a AWS desde PowerShell
+
+Desde la raiz del proyecto, usar una terminal por servicio:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/connect_aws.ps1 -Service api
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/connect_aws.ps1 -Service grafana
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/connect_aws.ps1 -Service prometheus
+```
+
+Ejecutar el primero y esperar a que abra el tunel antes de iniciar los siguientes.
+API: http://localhost:18080/docs; Grafana: http://localhost:13000/d/devops-api;
+Prometheus: http://localhost:19090/targets. Cada comando permanece ejecutandose.
+Ctrl+C cierra solo ese tunel. No crea ni destruye el laboratorio.
+
+El script agrega AWS CLI al PATH de su proceso, verifica la cuenta contra el
+terraform.tfvars local, detecta la IPv4 publica, actualiza el /32 de EKS si cambio,
+espera la actualizacion y sincroniza ADMIN_CIDR en GitHub y admin_cidr local.
+Luego actualiza kubeconfig y abre el tunel en 127.0.0.1. No abre 0.0.0.0/0.
+Terraform refrescara el cambio de EKS en el siguiente plan.
+
+Requiere sesion AWS valida (aws login --profile devops), el terraform.tfvars
+local, kubectl y Git con una credencial GitHub guardada con permisos sobre las
+variables del entorno aws-lab. Tambien admite GH_TOKEN en la sesion. Usa esa
+credencial sin imprimirla ni escribirla en archivos. No pegar tokens en Git.
+
+Se detiene si hay workflows en ejecucion, multiples CIDR en EKS, otra cuenta o
+un puerto ocupado. No ejecutar simultaneamente con Terraform/CD ni aprobar un
+nuevo despliegue mientras cambia el acceso: la comprobacion no es un bloqueo
+distribuido. Si GitHub falla despues del cambio AWS, informa sincronizacion
+incompleta; corregirla antes de volver a desplegar. Una VPN o cambio de red durante
+el tunel puede requerir cerrar y ejecutar nuevamente el script.
+
+Opciones:
+
+```powershell
+# Solo consultar: no modifica AWS, GitHub ni archivos; no abre tuneles.
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/connect_aws.ps1 -CheckOnly
+# Usar otro puerto local si 13000 esta ocupado.
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/connect_aws.ps1 -Service grafana -LocalPort 13002
+```
+
+La primera prueba realizada fue de sintaxis y CheckOnly. La ruta de escritura
+completa se verificara cuando se utilice para conectar; no se simulo un cambio de
+IP en AWS para probarlo.

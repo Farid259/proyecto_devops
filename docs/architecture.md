@@ -316,3 +316,9 @@ multinodo, notificaciones externas y analisis de dependencias/imagenes.
 
 Este dise?o prioriza un laboratorio reproducible y temporal. No promete alta
 disponibilidad ni operacion de produccion.
+
+### Ayudante de conexion
+
+[scripts/connect_aws.ps1](../scripts/connect_aws.ps1) sincroniza la IP /32 del
+operador con EKS, GitHub y tfvars y abre el tunel seleccionado. Uso y limitaciones
+en la [guia AWS](../k8s/aws/README.md#conexion-automatica-a-aws-desde-powershell).
