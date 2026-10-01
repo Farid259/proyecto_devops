@@ -1,6 +1,10 @@
 """Verificar scraping y dashboard en el cluster indicado; cerrar los tuneles al salir."""
 import argparse
 import json
+import os
+from pathlib import Path
+import shutil
+import tempfile
 import subprocess
 import time
 from urllib.request import Request, urlopen
@@ -20,16 +24,28 @@ def main():
     parser.add_argument("--context", required=True)
     args = parser.parse_args()
     commands = [args.kubectl, "--kubeconfig", args.kubeconfig, "--context", args.context, "-n", "monitoring"]
+    # Los tuneles heredan este entorno; no depender del PATH de otra terminal.
+    child_env = os.environ.copy()
+    if os.name == "nt" and not shutil.which("aws"):
+        aws_dir = Path(os.environ.get("ProgramFiles", r"C:\Program Files")) / "Amazon" / "AWSCLIV2"
+        if (aws_dir / "aws.exe").is_file():
+            child_env["PATH"] = str(aws_dir) + os.pathsep + child_env.get("PATH", "")
     processes = []
+    logs = []
     try:
         for service, ports in [("prometheus", "19091:9090"), ("grafana", "13001:3000")]:
+            log = tempfile.TemporaryFile()
+            logs.append((service, log))
             processes.append(subprocess.Popen(commands + ["port-forward", "service/" + service, ports,
-                              "--address=127.0.0.1"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
+                              "--address=127.0.0.1"], stdout=log, stderr=subprocess.STDOUT, env=child_env))
         deadline = time.monotonic() + 180
         error = None
         while time.monotonic() < deadline:
-            if any(p.poll() is not None for p in processes):
-                raise RuntimeError("Fallo port-forward; comprobar puertos 19091/13001 y acceso al cluster")
+            for process, (service, log) in zip(processes, logs):
+                if process.poll() is not None:
+                    log.seek(0)
+                    detail = log.read().decode("utf-8", errors="replace").strip()
+                    raise RuntimeError(f"Fallo port-forward de {service}:\n{detail}")
             try:
                 targets = read("http://localhost:19091/api/v1/targets")["data"]["activeTargets"]
                 api = [t for t in targets if t["labels"].get("job") == "api"]
@@ -52,9 +68,16 @@ def main():
         raise RuntimeError(f"Monitoreo no listo: {error}")
     finally:
         for process in processes:
-            process.terminate()
+            if process.poll() is None:
+                process.terminate()
         for process in processes:
-            process.wait(timeout=10)
+            try:
+                process.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+        for _, log in logs:
+            log.close()
 
 
 if __name__ == "__main__":
